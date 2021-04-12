@@ -1,7 +1,6 @@
 import React from 'react';
 import {GameBoardField} from "./GameBoardField";
-import {Unit} from "./Unit";
-import {UnitType, Team, GameState, Direction} from "../constants/Constants";
+import {GameState, Team, UnitType} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
 import {UnitModel} from "../model/UnitModel";
 import axios from "axios";
