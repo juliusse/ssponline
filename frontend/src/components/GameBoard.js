@@ -10,15 +10,18 @@ import {AppConfig} from "../config";
 export class GameBoard extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {};
-        this.handleClick = this.handleClick.bind(this);
+        this.state = {
+            requestingPlayer: Team.RED
+        };
+        this.handleFieldClick = this.handleFieldClick.bind(this);
+        this.handleToggleVisibleTeamClick = this.handleToggleVisibleTeamClick.bind(this);
     }
 
     componentDidMount() {
         axios({
             url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
             params: {
-                requestingPlayer: 'RED'
+                requestingPlayer: this.state.requestingPlayer.api
             }
         }).then(response => {
 
@@ -29,23 +32,6 @@ export class GameBoard extends React.Component {
                 selectedField: null
             });
         })
-    }
-
-    generateTeam(team) {
-        const allowedFigures = [UnitType.ROCK, UnitType.PAPER, UnitType.SCISSORS];
-
-        const fields = [];
-        for (let y = 0; y < 2; y++) {
-            const row = [];
-            for (let x = 0; x < 7; x++) {
-                const type = allowedFigures[Math.floor(Math.random() * 3)];
-
-                row.push(new UnitModel({team, type, visible: false}))
-
-            }
-            fields.push(row);
-        }
-        return fields;
     }
 
     generateBoard(units) {
@@ -87,18 +73,31 @@ export class GameBoard extends React.Component {
                 board: this.generateBoard(response.data.units),
                 activeTeam: Team[response.data.activeTeam],
                 gameState: GameState[response.data.gameState],
+                requestingPlayer: this.state.activeTeam === Team.RED ? Team.BLUE : Team.RED,
                 selectedField: null
             });
         })
-
-        // const winningUnit = unitFrom.type.winsAgainst(unitTo.type) ? unitFrom : unitTo;
-        // winningUnit.visible = true;
-        //
-        // this.state.board[from.y][from.x] = null;
-        // this.state.board[to.y][to.x] = winningUnit;
     }
 
-    handleClick({x, y}) {
+    handleToggleVisibleTeamClick() {
+        const requestingPlayer = this.state.requestingPlayer === Team.RED ? Team.BLUE : Team.RED;
+        this.setState({requestingPlayer});
+        axios({
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
+            params: {
+                requestingPlayer: requestingPlayer.api
+            }
+        }).then(response => {
+
+            this.setState({
+                board: this.generateBoard(response.data.units),
+                activeTeam: Team[response.data.activeTeam],
+                gameState: GameState[response.data.gameState]
+            });
+        })
+    }
+
+    handleFieldClick({x, y}) {
         const unit = this.state.board[y][x];
 
         // clicking on own unit
@@ -141,7 +140,7 @@ export class GameBoard extends React.Component {
                     x={x}
                     y={y}
                     color={color}
-                    onClick={this.handleClick}
+                    onClick={this.handleFieldClick}
                 />);
             }
 
@@ -150,8 +149,11 @@ export class GameBoard extends React.Component {
 
         return (
             <div className="container">
-                <div className="state">GameBoard | Turn: <span
-                    className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span></div>
+                <div className="state">GameBoard |
+                    Turn: <span className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span> |
+                    Visible Team: <button onClick={this.handleToggleVisibleTeamClick}
+                                          className={this.state.requestingPlayer.color}>{this.state.requestingPlayer.name}</button> |
+                </div>
                 <div className="gameboard">
                     {fields}
                 </div>
