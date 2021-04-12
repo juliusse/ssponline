@@ -65,49 +65,31 @@ export class GameBoard extends React.Component {
         return fields;
     }
 
-    initNewGame() {
-        return {
-            board: this.generateBoard(),
-            activeTeam: Team.RED,
-            gameState: GameState.SELECT_UNIT,
-            selectedField: null
-        }
-    }
-
     isAdjacentToSelectedField(otherField) {
         const selectedField = this.state.selectedField;
 
         return selectedField != null && isAdjacent(selectedField, otherField) != null;
     }
 
-    fight(attacker, defender) {
-        if (defender == null) {
-            return attacker;
-        }
-
-        return attacker.props.type.winsAgainst(defender.props.type) ? attacker : defender;
-    }
-
     moveUnit(from, to) {
-        const unitFrom = this.state.board[from.y][from.x];
-        const unitTo = this.state.board[to.y][to.x];
-
-        if (unitTo == null) {
-            this.state.board[from.y][from.x] = null;
-            this.state.board[to.y][to.x] = unitFrom;
-            return;
-        }
-
-        const winningUnit = unitFrom.type.winsAgainst(unitTo.type) ? unitFrom : unitTo;
-        winningUnit.visible = true;
-
-        this.state.board[from.y][from.x] = null;
-        this.state.board[to.y][to.x] = winningUnit;
-    }
-
-    toggleTeam() {
-        const nextTeam = this.state.activeTeam == Team.RED ? Team.BLUE : Team.RED;
-        this.setState({activeTeam: nextTeam});
+        axios({
+            method: 'post',
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}/move`,
+            data: {from, to}
+        }).then(response => {
+            this.setState({
+                board: this.generateBoard(response.data.units),
+                activeTeam: Team[response.data.activeTeam],
+                gameState: GameState[response.data.gameState],
+                selectedField: null
+            });
+        })
+        //
+        // const winningUnit = unitFrom.type.winsAgainst(unitTo.type) ? unitFrom : unitTo;
+        // winningUnit.visible = true;
+        //
+        // this.state.board[from.y][from.x] = null;
+        // this.state.board[to.y][to.x] = winningUnit;
     }
 
     handleClick({x, y}) {
@@ -129,7 +111,6 @@ export class GameBoard extends React.Component {
         // clicking on neigbouring field
         if (this.isAdjacentToSelectedField({x, y})) {
             this.moveUnit(this.state.selectedField, {x, y});
-            this.toggleTeam();
         }
 
         // clicking on invalid field

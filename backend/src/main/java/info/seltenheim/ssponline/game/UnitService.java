@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +19,14 @@ public class UnitService {
 
     public List<Unit> getUnitsForGame(@NonNull String gameId) {
         return unitRepository.findAllByGameId(gameId);
+    }
+
+    public Optional<Unit> findUnitInLocation(@NonNull String gameId, @NonNull Point location) {
+        return unitRepository.findByGameIdAndLocation(gameId, location);
+    }
+
+    public void updateUnitPosition(@NonNull Long id, @NonNull Point location) {
+        unitRepository.updateUnitLocation(id, location);
     }
 
     public void createUnitsForTeam(@NonNull String gameId, @NonNull Team team) {
