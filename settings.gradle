@@ -8,3 +8,7 @@
  */
 
 rootProject.name = 'ssponline'
+include(':backend')
+project(":backend").projectDir = file('backend')
+include(':frontend')
+project(":frontend").projectDir = file('frontend')
