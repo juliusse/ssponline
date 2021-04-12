@@ -1,9 +1,13 @@
 export const Team = {
     RED: {
-        imgColor: 'r'
+        name: 'red',
+        imgColor: 'r',
+        color: 'red'
     },
     BLUE: {
-        imgColor: 'b'
+        name: 'blue',
+        imgColor: 'b',
+        color: 'blue'
     }
 }
 
@@ -15,15 +19,24 @@ export const GameState = {
 export const UnitType = {
     ROCK: {
         name: 'rock',
-        src: (color) => `./src/assets/oldschool/${color}_stein.gif`
+        src: (color) => `./src/assets/oldschool/${color}_stein.gif`,
+        winsAgainst: (unitType) => {
+            return unitType === UnitType.SCISSORS || unitType === UnitType.FLAG;
+        }
     },
     PAPER: {
         name: 'paper',
-        src: (color) => `./src/assets/oldschool/${color}_schere.gif`
+        src: (color) => `./src/assets/oldschool/${color}_papier.gif`,
+        winsAgainst: (unitType) => {
+            return unitType === UnitType.ROCK || unitType === UnitType.FLAG;
+        }
     },
     SCISSORS: {
         name: 'scissors',
-        src: (color) => `./src/assets/oldschool/${color}_papier.gif`
+        src: (color) => `./src/assets/oldschool/${color}_schere.gif`,
+        winsAgainst: (unitType) => {
+            return unitType === UnitType.PAPER || unitType === UnitType.FLAG;
+        }
     },
     TRAP: {
         name: 'trap',

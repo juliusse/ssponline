@@ -1,3 +1,12 @@
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+.state {
+    width: 600px;
+    margin: 12px auto;
+}
 .gameboard {
     display: flex;
     flex-direction: column;
@@ -32,4 +41,12 @@
 
 .white {
     background-color: white;
+}
+
+.red {
+    color: red;
+}
+
+.blue {
+    color: blue;
 }
