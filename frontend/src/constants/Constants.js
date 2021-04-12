@@ -46,6 +46,10 @@ export const UnitType = {
         name: 'flag',
         src: (color) => `./src/assets/oldschool/${color}_flagge.gif`
     },
+    HIDDEN: {
+        name: 'flag',
+        src: (color) => `./src/assets/oldschool/${color}_frage.gif`
+    },
 };
 
 export const Direction = {

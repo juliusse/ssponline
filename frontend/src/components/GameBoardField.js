@@ -32,7 +32,6 @@ export class GameBoardField extends React.Component {
         const unit = this.getUnit();
         let content = <Unit
             model={unit}
-            isMyTeamsTurn={this.isMyTeamsTurn()}
         />;
         if (!this.isMyTeamsTurn() && this.props.state.gameState === GameState.MOVE_UNIT) {
             const selectedField = this.props.state.selectedField;

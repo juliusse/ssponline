@@ -29,6 +29,30 @@ public class UnitService {
         unitRepository.updateUnitLocation(id, location);
     }
 
+    public void fight(Unit attacker, Unit defender) {
+        final var attackerType = attacker.getType();
+        final var defenderType = defender.getType();
+
+        Unit winner;
+        if (defenderType == UnitType.FLAG) {
+            winner = attacker;
+        } else if (defenderType == UnitType.TRAP) {
+            winner = defender;
+        } else if ((attackerType == UnitType.ROCK && defenderType == UnitType.SCISSORS)
+                || (attackerType == UnitType.SCISSORS && defenderType == UnitType.PAPER)
+                || (attackerType == UnitType.PAPER && defenderType == UnitType.ROCK)) {
+            winner = attacker;
+        } else {
+            winner = defender;
+        }
+        unitRepository.delete(winner == attacker ? defender : attacker);
+
+
+        winner.setVisible(true);
+        winner.setLocation(defender.getLocation());
+        unitRepository.save(winner);
+    }
+
     public void createUnitsForTeam(@NonNull String gameId, @NonNull Team team) {
         unitRepository.deleteAllByGameIdAndTeam(gameId, team);
 
