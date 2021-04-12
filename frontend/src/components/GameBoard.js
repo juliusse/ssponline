@@ -4,6 +4,8 @@ import {Unit} from "./Unit";
 import {UnitType, Team, GameState, Direction} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
 import {UnitModel} from "../model/UnitModel";
+import axios from "axios";
+import {AppConfig} from "../config";
 
 
 export class GameBoard extends React.Component {
@@ -14,7 +16,17 @@ export class GameBoard extends React.Component {
     }
 
     componentDidMount() {
-        this.setState(this.initNewGame());
+        axios({
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
+        }).then(response => {
+
+            this.setState({
+                board: this.generateBoard(response.data.units),
+                activeTeam: Team[response.data.activeTeam],
+                gameState: GameState[response.data.gameState],
+                selectedField: null
+            });
+        })
     }
 
     generateTeam(team) {
@@ -34,12 +46,21 @@ export class GameBoard extends React.Component {
         return fields;
     }
 
-    generateBoard() {
+    generateBoard(units) {
         const fields = [];
-        this.generateTeam(Team.RED).forEach(row => fields.push(row));
         fields.push([null, null, null, null, null, null, null]);
         fields.push([null, null, null, null, null, null, null]);
-        this.generateTeam(Team.BLUE).forEach(row => fields.push(row));
+        fields.push([null, null, null, null, null, null, null]);
+        fields.push([null, null, null, null, null, null, null]);
+        fields.push([null, null, null, null, null, null, null]);
+        fields.push([null, null, null, null, null, null, null]);
+
+        units.forEach(unit => {
+            const team = Team[unit.team];
+            const type = UnitType[unit.type];
+            const model = new UnitModel({team, type, visible: false})
+            fields[unit.location.y][unit.location.x] = model;
+        })
 
         return fields;
     }
@@ -60,7 +81,7 @@ export class GameBoard extends React.Component {
     }
 
     fight(attacker, defender) {
-        if(defender == null) {
+        if (defender == null) {
             return attacker;
         }
 
@@ -93,7 +114,7 @@ export class GameBoard extends React.Component {
         const unit = this.state.board[y][x];
 
         // clicking on own unit
-        if(unit !== null && unit.team === this.state.activeTeam) {
+        if (unit !== null && unit.team === this.state.activeTeam) {
             switch (this.state.gameState) {
                 case "SELECT_UNIT":
                 case "MOVE_UNIT":
@@ -142,7 +163,8 @@ export class GameBoard extends React.Component {
 
         return (
             <div className="container">
-                <div className="state">GameBoard | Turn: <span className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span></div>
+                <div className="state">GameBoard | Turn: <span
+                    className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span></div>
                 <div className="gameboard">
                     {fields}
                 </div>

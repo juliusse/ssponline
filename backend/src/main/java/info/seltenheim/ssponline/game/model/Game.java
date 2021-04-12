@@ -23,8 +23,4 @@ public class Game {
     @Column(name = "game_state")
     @Enumerated(EnumType.ORDINAL)
     private GameState gameState;
-
-    @Column(name = "board", length = 2024)
-    @Convert(converter = GameBoard.GameBoardConverter.class)
-    private GameBoard gameBoard;
 }
