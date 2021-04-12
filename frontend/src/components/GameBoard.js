@@ -18,6 +18,9 @@ export class GameBoard extends React.Component {
     componentDidMount() {
         axios({
             url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
+            params: {
+                requestingPlayer: 'RED'
+            }
         }).then(response => {
 
             this.setState({
@@ -58,7 +61,8 @@ export class GameBoard extends React.Component {
         units.forEach(unit => {
             const team = Team[unit.team];
             const type = UnitType[unit.type];
-            const model = new UnitModel({team, type, visible: false})
+            const visible = UnitType[unit.visible];
+            const model = new UnitModel({team, type, visible})
             fields[unit.location.y][unit.location.x] = model;
         })
 
@@ -75,7 +79,10 @@ export class GameBoard extends React.Component {
         axios({
             method: 'post',
             url: AppConfig.backendUrl + `/game/${this.props.gameId}/move`,
-            data: {from, to}
+            data: {from, to},
+            params: {
+                requestingPlayer: this.state.activeTeam === Team.RED ? 'BLUE' : 'RED'
+            }
         }).then(response => {
             this.setState({
                 board: this.generateBoard(response.data.units),
@@ -84,7 +91,7 @@ export class GameBoard extends React.Component {
                 selectedField: null
             });
         })
-        //
+
         // const winningUnit = unitFrom.type.winsAgainst(unitTo.type) ? unitFrom : unitTo;
         // winningUnit.visible = true;
         //

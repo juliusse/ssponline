@@ -34,15 +34,19 @@ public class GameService {
     public Game moveUnit(@NonNull String gameId, @NonNull Point from, @NonNull Point to) {
         final var game = gameRepository.findById(gameId)
                 .orElseThrow();
-        var unitFrom = unitService.findUnitInLocation(gameId, from)
+        final var unitFrom = unitService.findUnitInLocation(gameId, from)
                 .orElseThrow();
-        final var unitTo = unitService.findUnitInLocation(gameId, to);
+        final var unitToOptional = unitService.findUnitInLocation(gameId, to);
 
-        if (unitTo.isEmpty()) {
+        if (unitToOptional.isEmpty()) {
             unitService.updateUnitPosition(unitFrom.getId(), to);
             toggleTeamsTurn(game);
+            return game;
         }
 
+        final var unitTo = unitToOptional.get();
+        unitService.fight(unitFrom, unitTo);
+        toggleTeamsTurn(game);
         return game;
     }
 

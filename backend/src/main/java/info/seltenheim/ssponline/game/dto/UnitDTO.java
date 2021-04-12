@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UnitDTO {
     private Team team;
-    private UnitType type;
+    private UnitTypeDTO type;
     private Point location;
 }
