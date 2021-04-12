@@ -6,9 +6,12 @@ export class Unit extends React.Component {
     }
 
     render() {
+        if(this.props.model == null) {
+            return <div></div>;
+        }
         return (
             <div>
-                <img src={this.props.type.src(this.props.team.imgColor)} />
+                <img src={this.props.model.getImage(this.props.isMyTeamsTurn)} />
             </div>
         );
     }

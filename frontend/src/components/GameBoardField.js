@@ -1,6 +1,7 @@
 import React from 'react';
 import {GameState} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
+import {Unit} from "./Unit";
 
 export class GameBoardField extends React.Component {
     constructor(props) {
@@ -18,7 +19,7 @@ export class GameBoardField extends React.Component {
 
     isMyTeamsTurn() {
         const unit = this.getUnit();
-        return unit != null && unit.props.team === this.props.state.activeTeam;
+        return unit != null && unit.team === this.props.state.activeTeam;
     }
 
     classSelected() {
@@ -28,8 +29,11 @@ export class GameBoardField extends React.Component {
     }
 
     render() {
-        let content = this.props.state.board[this.props.y][this.props.x];
-
+        const unit = this.getUnit();
+        let content = <Unit
+            model={unit}
+            isMyTeamsTurn={this.isMyTeamsTurn()}
+        />;
         if (!this.isMyTeamsTurn() && this.props.state.gameState === GameState.MOVE_UNIT) {
             const selectedField = this.props.state.selectedField;
             const direction = isAdjacent(selectedField, this.props);
