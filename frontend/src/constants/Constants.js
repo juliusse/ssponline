@@ -1,10 +1,12 @@
 export const Team = {
     RED: {
+        api: 'RED',
         name: 'red',
         imgColor: 'r',
         color: 'red'
     },
     BLUE: {
+        api: 'BLUE',
         name: 'blue',
         imgColor: 'b',
         color: 'blue'
