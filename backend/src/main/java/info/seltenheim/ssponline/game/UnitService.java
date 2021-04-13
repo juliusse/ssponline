@@ -29,12 +29,16 @@ public class UnitService {
         unitRepository.updateUnitLocation(id, location);
     }
 
-    public void fight(Unit attacker, Unit defender) {
+    public FightResult fight(Unit attacker, Unit defender) {
         final var attackerType = attacker.getType();
         final var defenderType = defender.getType();
 
         Unit winner;
-        if (defenderType == UnitType.FLAG) {
+        if(attackerType == defenderType) {
+            unitRepository.delete(attacker);
+            unitRepository.delete(defender);
+            return FightResult.TIE;
+        } else if (defenderType == UnitType.FLAG) {
             winner = attacker;
         } else if (defenderType == UnitType.TRAP) {
             winner = defender;
@@ -51,6 +55,7 @@ public class UnitService {
         winner.setVisible(true);
         winner.setLocation(defender.getLocation());
         unitRepository.save(winner);
+        return FightResult.WIN;
     }
 
     public void createUnitsForTeam(@NonNull String gameId, @NonNull Team team) {
@@ -68,5 +73,9 @@ public class UnitService {
                 unitRepository.save(unit);
             }
         }
+    }
+
+    public enum FightResult {
+        WIN, TIE
     }
 }

@@ -14,8 +14,9 @@ export const Team = {
 }
 
 export const GameState = {
-    SELECT_UNIT: 'SELECT_UNIT',
-    MOVE_UNIT: 'MOVE_UNIT'
+    TURN: 'TURN',
+    MOVE_UNIT: 'MOVE_UNIT',
+    FIGHT: 'FIGHT',
 }
 
 export const UnitType = {
@@ -42,6 +43,10 @@ export const UnitType = {
     HIDDEN: {
         name: 'flag',
         src: (color) => `/assets/img/oldschool/${color}_frage.gif`
+    },
+    FIGHT: {
+        name: 'fight',
+        src: () => `/assets/img/oldschool/kampf.gif`
     },
 };
 

@@ -1,0 +1,10 @@
+.unitSelector {
+    display: flex;
+    width: 600px;
+    margin: 12px auto;
+}
+
+.unitSelector * {
+    display: flex;
+    margin: 0px 15px;
+}

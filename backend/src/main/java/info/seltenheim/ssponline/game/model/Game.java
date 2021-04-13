@@ -9,7 +9,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "game")
 public class Game {
     @Id
@@ -23,4 +22,10 @@ public class Game {
     @Column(name = "game_state")
     @Enumerated(EnumType.ORDINAL)
     private GameState gameState;
+
+    public Game(String id, Team activeTeam, GameState gameState) {
+        this.id = id;
+        this.activeTeam = activeTeam;
+        this.gameState = gameState;
+    }
 }

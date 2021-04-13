@@ -5,7 +5,7 @@ export class UnitModel {
     }
 
     getImage() {
-        return this.type.src(this.team.imgColor);
+        return this.type.src(this.team && this.team.imgColor);
     }
 
     getName() {
