@@ -10,28 +10,55 @@ import {AppConfig} from "../config";
 export class GameBoard extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            requestingPlayer: Team.RED
-        };
+        this.team = Team[props.team];
+        this.state = {};
         this.handleFieldClick = this.handleFieldClick.bind(this);
-        this.handleToggleVisibleTeamClick = this.handleToggleVisibleTeamClick.bind(this);
     }
 
     componentDidMount() {
+        this.reloadBoard();
+    }
+
+    isMyTurn() {
+        return this.state.requestingPlayer === this.state.activeTeam;
+    }
+
+    startCheck() {
+        if (this.intervallId == null) {
+            this.intervallId = setInterval(() => {
+                this.reloadBoard();
+            }, 1000);
+        }
+    }
+
+    stopCheck() {
+        clearInterval(this.intervallId);
+        this.intervallId = null;
+    }
+
+    handleBoardResponse(response) {
+        const activeTeam = Team[response.data.activeTeam];
+        this.setState({
+            board: this.generateBoard(response.data.units),
+            activeTeam,
+            gameState: GameState[response.data.gameState],
+            selectedField: null
+        });
+
+        if (activeTeam !== this.team) {
+            this.startCheck();
+        } else {
+            this.stopCheck();
+        }
+    }
+
+    reloadBoard() {
         axios({
             url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
             params: {
-                requestingPlayer: this.state.requestingPlayer.api
+                requestingPlayer: this.team.api
             }
-        }).then(response => {
-
-            this.setState({
-                board: this.generateBoard(response.data.units),
-                activeTeam: Team[response.data.activeTeam],
-                gameState: GameState[response.data.gameState],
-                selectedField: null
-            });
-        })
+        }).then(this.handleBoardResponse.bind(this))
     }
 
     generateBoard(units) {
@@ -66,42 +93,16 @@ export class GameBoard extends React.Component {
             url: AppConfig.backendUrl + `/game/${this.props.gameId}/move`,
             data: {from, to},
             params: {
-                requestingPlayer: this.state.activeTeam === Team.RED ? 'BLUE' : 'RED'
+                requestingPlayer: this.team.api
             }
-        }).then(response => {
-            this.setState({
-                board: this.generateBoard(response.data.units),
-                activeTeam: Team[response.data.activeTeam],
-                gameState: GameState[response.data.gameState],
-                requestingPlayer: this.state.activeTeam === Team.RED ? Team.BLUE : Team.RED,
-                selectedField: null
-            });
-        })
-    }
-
-    handleToggleVisibleTeamClick() {
-        const requestingPlayer = this.state.requestingPlayer === Team.RED ? Team.BLUE : Team.RED;
-        this.setState({requestingPlayer});
-        axios({
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
-            params: {
-                requestingPlayer: requestingPlayer.api
-            }
-        }).then(response => {
-
-            this.setState({
-                board: this.generateBoard(response.data.units),
-                activeTeam: Team[response.data.activeTeam],
-                gameState: GameState[response.data.gameState]
-            });
-        })
+        }).then(this.handleBoardResponse.bind(this))
     }
 
     handleFieldClick({x, y}) {
         const unit = this.state.board[y][x];
 
         // clicking on own unit
-        if (unit !== null && unit.team === this.state.activeTeam) {
+        if (unit !== null && unit.team === this.team && this.team === this.state.activeTeam) {
             switch (this.state.gameState) {
                 case "SELECT_UNIT":
                 case "MOVE_UNIT":
@@ -151,10 +152,8 @@ export class GameBoard extends React.Component {
 
         return (
             <div className="container">
-                <div className="state">GameBoard |
-                    Turn: <span className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span> |
-                    Visible Team: <button onClick={this.handleToggleVisibleTeamClick}
-                                          className={this.state.requestingPlayer.color}>{this.state.requestingPlayer.name}</button> |
+                <div className="state">GameBoard | Turn: <span
+                    className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span>
                 </div>
                 <div className="gameboard">
                     {fields}
