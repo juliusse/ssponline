@@ -37,7 +37,7 @@ export class GameBoardField extends React.Component {
             const selectedField = this.props.state.selectedField;
             const direction = isAdjacent(selectedField, this.props);
             if(direction != null) {
-                content = <img src={direction.src}/>
+                content = <img alt="direction" src={direction.src}/>
             }
         }
 
