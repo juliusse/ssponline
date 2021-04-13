@@ -7,10 +7,12 @@ import info.seltenheim.ssponline.game.model.Team;
 import info.seltenheim.ssponline.game.repository.GameRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class GameService {
@@ -25,6 +27,7 @@ public class GameService {
 
 
     public Game createNewGame(@NonNull String id) {
+        log.info("Creating new Game with id '{}'", id);
         final var game = gameRepository.save(new Game(id, Team.RED, GameState.SELECT_UNIT));
         unitService.createUnitsForTeam(id, Team.RED);
         unitService.createUnitsForTeam(id, Team.BLUE);
