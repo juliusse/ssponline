@@ -1,5 +1,3 @@
-import React from 'react';
-
 export class UnitModel {
     constructor({team, type}) {
         this.team = team;
@@ -8,5 +6,9 @@ export class UnitModel {
 
     getImage() {
         return this.type.src(this.team.imgColor);
+    }
+
+    getName() {
+        return this.type.name;
     }
 }

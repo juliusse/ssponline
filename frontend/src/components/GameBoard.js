@@ -109,6 +109,8 @@ export class GameBoard extends React.Component {
                         selectedField: {x, y},
                         gameState: GameState.MOVE_UNIT
                     })
+                    break;
+                default:
             }
 
             return;
