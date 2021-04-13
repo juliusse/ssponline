@@ -21,41 +21,41 @@ export const GameState = {
 export const UnitType = {
     ROCK: {
         name: 'rock',
-        src: (color) => `./src/assets/oldschool/${color}_stein.gif`,
+        src: (color) => `/assets/img/oldschool/${color}_stein.gif`,
     },
     PAPER: {
         name: 'paper',
-        src: (color) => `./src/assets/oldschool/${color}_papier.gif`,
+        src: (color) => `/assets/img/oldschool/${color}_papier.gif`,
     },
     SCISSORS: {
         name: 'scissors',
-        src: (color) => `./src/assets/oldschool/${color}_schere.gif`,
+        src: (color) => `/assets/img/oldschool/${color}_schere.gif`,
     },
     TRAP: {
         name: 'trap',
-        src: (color) => `./src/assets/oldschool/${color}_falle.gif`
+        src: (color) => `/assets/img/oldschool/${color}_falle.gif`
     },
     FLAG: {
         name: 'flag',
-        src: (color) => `./src/assets/oldschool/${color}_flagge.gif`
+        src: (color) => `/assets/img/oldschool/${color}_flagge.gif`
     },
     HIDDEN: {
         name: 'flag',
-        src: (color) => `./src/assets/oldschool/${color}_frage.gif`
+        src: (color) => `/assets/img/oldschool/${color}_frage.gif`
     },
 };
 
 export const Direction = {
     UP: {
-        src: `./src/assets/oldschool/pfeil_o.gif`
+        src: `/assets/img/oldschool/pfeil_o.gif`
     },
     DOWN: {
-        src: `./src/assets/oldschool/pfeil_u.gif`
+        src: `/assets/img/oldschool/pfeil_u.gif`
     },
     LEFT: {
-        src: `./src/assets/oldschool/pfeil_l.gif`
+        src: `/assets/img/oldschool/pfeil_l.gif`
     },
     RIGHT: {
-        src: `./src/assets/oldschool/pfeil_r.gif`
+        src: `/assets/img/oldschool/pfeil_r.gif`
     },
 }
