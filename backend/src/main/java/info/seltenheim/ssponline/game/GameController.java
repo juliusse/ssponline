@@ -1,10 +1,7 @@
 package info.seltenheim.ssponline.game;
 
 import info.seltenheim.ssponline.game.dto.*;
-import info.seltenheim.ssponline.game.model.Fight;
-import info.seltenheim.ssponline.game.model.GameState;
-import info.seltenheim.ssponline.game.model.Team;
-import info.seltenheim.ssponline.game.model.UnitType;
+import info.seltenheim.ssponline.game.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,49 +23,80 @@ public class GameController {
         return toGameDTO(gameId, team);
     }
 
-    @PostMapping("/game/{gameId}/move")
-    public GameDTO moveUnit(@PathVariable String gameId,
-                            @RequestParam("requestingPlayer") Team team,
-                            @RequestBody MoveUnitRequestDTO request) {
-        gameService.moveUnit(gameId, request.getFrom(), request.getTo());
-
-        return toGameDTO(gameId, team);
-    }
-
-    @PostMapping("/game/{gameId}/fight/choose")
-    public GameDTO chooseUnitInFight(@PathVariable String gameId,
-                            @RequestParam("requestingPlayer") Team team,
-                            @RequestBody FightChoseUnitRequestDTO request) {
-
-        gameService.chooseUnitForFight(gameId, team, UnitType.valueOf(request.getUnitType().name()));
-
-        return toGameDTO(gameId, team);
-    }
+//    @PostMapping("/game/{gameId}/move")
+//    public GameDTO moveUnit(@PathVariable String gameId,
+//                            @RequestParam("requestingPlayer") Team team,
+//                            @RequestBody MoveUnitRequestDTO request) {
+//        gameService.moveUnit(gameId, request.getFrom(), request.getTo());
+//
+//        return toGameDTO(gameId, team);
+//    }
+//
+//    @PostMapping("/game/{gameId}/fight/choose")
+//    public GameDTO chooseUnitInFight(@PathVariable String gameId,
+//                            @RequestParam("requestingPlayer") Team team,
+//                            @RequestBody FightChoseUnitRequestDTO request) {
+//
+//        gameService.chooseUnitForFight(gameId, team, UnitType.valueOf(request.getUnitType().name()));
+//
+//        return toGameDTO(gameId, team);
+//    }
 
     private GameDTO toGameDTO(String gameId, Team requestingTeam) {
         final var game = gameService.getGame(gameId);
-        final var units = unitService.getUnitsForGame(gameId);
-        final var fight = game.getGameState() == GameState.FIGHT ? gameService.getFightForGame(gameId) : null;
-        units.forEach(entityManager::refresh);
+        final var gameActions = gameService.getGameActions(gameId);
+        gameActions.forEach(entityManager::refresh);
 
-        final var unitDTOs = units
-                .stream()
-                .map(unit -> {
-                    final var isMyUnit = requestingTeam == unit.getTeam();
-                    final var isUncovered = unit.isVisible();
-                    final var unitType = isMyUnit || isUncovered ?
-                            UnitTypeDTO.valueOf(unit.getType().name()) :
-                            UnitTypeDTO.HIDDEN;
-                    return new UnitDTO(unit.getTeam(), unitType, unit.getLocation());
-                })
-                .collect(Collectors.toList());
+
+//        final var fight = game.getGameState() == GameState.FIGHT ? gameService.getFightForGame(gameId) : null;
+//        units.forEach(entityManager::refresh);
+
         return new GameDTO(
-                game.getId(),
-                game.getActiveTeam(),
-                game.getGameState(),
-                unitDTOs,
-                toFightDTO(fight, requestingTeam)
+                gameId,
+                gameActions.stream().map(ga -> toGameActionDTO(ga, requestingTeam)).collect(Collectors.toList())
         );
+    }
+
+    private GameActionDTO toGameActionDTO(GameAction gameAction, Team requestingTeam) {
+        GameActionDTO gameActionDTO = null;
+
+        if (gameAction instanceof GameActionConfigure) {
+            gameActionDTO = new GameActionConfigureDTO();
+        }
+
+        if (gameAction instanceof GameActionShuffleUnits) {
+            final var unitDTOs = ((GameActionShuffleUnits) gameAction).getUnits()
+                    .stream()
+                    .map(unit -> {
+                        final var isMyUnit = requestingTeam == unit.getTeam();
+                        final var isUncovered = unit.isVisible();
+                        final var unitType = isMyUnit || isUncovered ?
+                                UnitTypeDTO.valueOf(unit.getType().name()) :
+                                UnitTypeDTO.HIDDEN;
+                        return new GameActionUnitDTO(unit.getTeam(), unitType, unit.getLocation(), unit.isVisible());
+                    })
+                    .collect(Collectors.toList());
+
+            gameActionDTO = new GameActionShuffleUnitsDTO()
+                    .setTeam(((GameActionShuffleUnits) gameAction).getTeam())
+                    .setUnits(unitDTOs);
+        }
+
+        if (gameAction instanceof GameActionAcceptUnits) {
+            gameActionDTO = new GameActionAcceptUnitsDTO()
+                    .setTeam(((GameActionAcceptUnits) gameAction).getTeam());
+        }
+
+        if (gameAction instanceof GameActionStart) {
+            gameActionDTO = new GameActionStartDTO();
+        }
+
+        return gameActionDTO
+                .setGameId(gameAction.getGameId())
+                .setActionId(gameAction.getActionId())
+                .setActionType(gameAction.getActionType())
+                .setActiveTeam(gameAction.getActiveTeam())
+                .setGameState(gameAction.getGameState());
     }
 
     private FightDTO toFightDTO(Fight fight, Team requestingTeam) {

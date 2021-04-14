@@ -12,13 +12,86 @@ export class GameBoard extends React.Component {
     constructor(props) {
         super(props);
         this.team = Team[props.team];
+        this.actions = [];
+        this.lastProcessedAction = -1;
         this.state = {};
         this.handleFieldClick = this.handleFieldClick.bind(this);
         this.handleFightUnitChosen = this.handleFightUnitChosen.bind(this);
     }
 
     componentDidMount() {
-        this.reloadBoard();
+        this.loadActions();
+    }
+
+    componentWillUnmount() {
+        this.stopCheck();
+    }
+
+    loadActions() {
+        axios({
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
+            params: {
+                requestingPlayer: this.team.api,
+                fromIndex: this.lastProcessedAction
+            }
+        }).then(this.processActions.bind(this))
+    }
+
+    processActions(response) {
+        response.data.gameActions.map(this.processAction.bind(this));
+    }
+
+    processAction(action) {
+        if (action.actionType === 'CONFIGURE') {
+            this.processActionConfigure(action);
+        } else if (action.actionType === 'SHUFFLE_UNITS') {
+            this.processActionShuffleUnits(action);
+        } else if (action.actionType === 'ACCEPT_UNITS') {
+            this.processActionAcceptTurn(action);
+        } else if (action.actionType === 'SHUFFLE_UNITS') {
+            this.processActionGameStart(action);
+        }
+
+        this.setState({
+            activeTeam: Team[action.activeTeam],
+            gameState: GameState[action.gameState]
+        })
+        this.lastProcessedAction = action.actionId;
+    }
+
+    processActionConfigure(configureAction) {
+        const board = [];
+        board.push([null, null, null, null, null, null, null]);
+        board.push([null, null, null, null, null, null, null]);
+        board.push([null, null, null, null, null, null, null]);
+        board.push([null, null, null, null, null, null, null]);
+        board.push([null, null, null, null, null, null, null]);
+        board.push([null, null, null, null, null, null, null]);
+
+        this.setState({board})
+    }
+
+    processActionShuffleUnits(shuffleUnitsAction) {
+        const board = this.state.board;
+        shuffleUnitsAction
+            .units
+            .map(unit => {
+                const team = Team[unit.team];
+                const type = UnitType[unit.type];
+                const visible = UnitType[unit.visible];
+                const model = new UnitModel({team, type, visible})
+                board[unit.location.y][unit.location.x] = model;
+            });
+
+        this.setState({board})
+    }
+
+    processActionAcceptTurn(acceptTurnAction) {
+        // todo
+    }
+
+    processActionGameStart(gameStartAction) {
+        // todo
     }
 
     isMyTurn() {
@@ -28,7 +101,7 @@ export class GameBoard extends React.Component {
     startCheck() {
         if (this.intervallId == null) {
             this.intervallId = setInterval(() => {
-                this.reloadBoard();
+                this.loadActions();
             }, 2000);
         }
     }
@@ -171,11 +244,12 @@ export class GameBoard extends React.Component {
         }
 
         const unitSelector = this.state.gameState === GameState.FIGHT ?
-            <UnitSelector team={this.team} onChooseUnit={this.handleFightUnitChosen} /> : null;
+            <UnitSelector team={this.team} onChooseUnit={this.handleFightUnitChosen}/> : null;
+        const turnView = this.state.activeTeam != null ?
+            <span className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span> : null;
         return (
             <div className="container">
-                <div className="state">GameBoard | Turn: <span
-                    className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span>
+                <div className="state">GameBoard | Turn: {turnView}
                 </div>
                 <div className="gameboard">
                     {fields}
