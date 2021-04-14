@@ -19,34 +19,42 @@ export const GameState = {
     FIGHT: 'FIGHT',
 }
 
+const theme = 'figuren';
 export const UnitType = {
     ROCK: {
+        api: 'ROCK',
         name: 'rock',
-        src: (color) => `/assets/img/oldschool/${color}_stein.gif`,
+        src: (color) => `/assets/img/${theme}/${color}_stein.gif`,
     },
     PAPER: {
+        api: 'PAPER',
         name: 'paper',
-        src: (color) => `/assets/img/oldschool/${color}_papier.gif`,
+        src: (color) => `/assets/img/${theme}/${color}_papier.gif`,
     },
     SCISSORS: {
+        api: 'SCISSORS',
         name: 'scissors',
-        src: (color) => `/assets/img/oldschool/${color}_schere.gif`,
+        src: (color) => `/assets/img/${theme}/${color}_schere.gif`,
     },
     TRAP: {
+        api: 'TRAP',
         name: 'trap',
-        src: (color) => `/assets/img/oldschool/${color}_falle.gif`
+        src: (color) => `/assets/img/${theme}/${color}_falle.gif`
     },
     FLAG: {
+        api: 'FLAG',
         name: 'flag',
-        src: (color) => `/assets/img/oldschool/${color}_flagge.gif`
+        src: (color) => `/assets/img/${theme}/${color}_flagge.gif`
     },
     HIDDEN: {
+        api: 'HIDDEN',
         name: 'flag',
-        src: (color) => `/assets/img/oldschool/${color}_frage.gif`
+        src: (color) => `/assets/img/${theme}/${color}_frage.gif`
     },
     FIGHT: {
+        api: 'FIGHT',
         name: 'fight',
-        src: () => `/assets/img/oldschool/kampf.gif`
+        src: () => `/assets/img/${theme}/kampf.gif`
     },
 };
 

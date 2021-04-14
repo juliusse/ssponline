@@ -18,7 +18,7 @@ class App extends React.Component {
         const devMode = this.getQueryVariable('dev') || false;
         const gameId = this.getQueryVariable('gameId') || 'dev';
         const team = this.getQueryVariable('team') || 'RED';
-        const otherTeam = this.getQueryVariable('team') === 'RED' ? 'BLUE' : 'RED';
+        const otherTeam = team === 'RED' ? 'BLUE' : 'RED';
 
         const devBoard = devMode ? <GameBoard team={otherTeam} gameId={gameId}/> : null;
         return (

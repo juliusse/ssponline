@@ -30,4 +30,21 @@ public class Fight {
         this.gameId = gameId;
         this.location = location;
     }
+
+    public UnitType getChoiceForTeam(Team team) {
+        return team == Team.RED ? getRedChoice() : getBlueChoice();
+    }
+
+    public void setChoiceForTeam(Team team, UnitType type) {
+        if(team == Team.RED) {
+            setRedChoice(type);
+        } else {
+            setBlueChoice(type);
+        }
+    }
+
+    public boolean isBothUnitsSet() {
+        return getRedChoice() != null && getBlueChoice() != null;
+    }
+
 }

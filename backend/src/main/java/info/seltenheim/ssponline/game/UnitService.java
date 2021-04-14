@@ -29,33 +29,49 @@ public class UnitService {
         unitRepository.updateUnitLocation(id, location);
     }
 
-    public FightResult fight(Unit attacker, Unit defender) {
-        final var attackerType = attacker.getType();
-        final var defenderType = defender.getType();
+    public FightResult fightAfterMove(Unit attacker, Unit defender) {
+        final var fightResult = fight(attacker.getType(), defender.getType());
 
-        Unit winner;
+        switch (fightResult) {
+            case ATTACKER_WINS:
+                unitRepository.delete(defender);
+                attacker.setVisible(true);
+                attacker.setLocation(defender.getLocation());
+                unitRepository.save(attacker);
+                break;
+            case DEFENDER_WINS:
+                unitRepository.delete(attacker);
+                defender.setVisible(true);
+                unitRepository.save(defender);
+                break;
+            case TIE:
+                unitRepository.delete(attacker);
+                unitRepository.delete(defender);
+                break;
+        }
+
+        return fightResult;
+    }
+
+    public Unit creatNewUnit(@NonNull String gameId, Team team, UnitType type, Point location, boolean visible) {
+        final var newUnit = new Unit(gameId, team, type, location, visible);
+        return unitRepository.save(newUnit);
+    }
+
+    public FightResult fight(UnitType attackerType, UnitType defenderType) {
         if(attackerType == defenderType) {
-            unitRepository.delete(attacker);
-            unitRepository.delete(defender);
             return FightResult.TIE;
         } else if (defenderType == UnitType.FLAG) {
-            winner = attacker;
+            return FightResult.ATTACKER_WINS;
         } else if (defenderType == UnitType.TRAP) {
-            winner = defender;
+            return FightResult.DEFENDER_WINS;
         } else if ((attackerType == UnitType.ROCK && defenderType == UnitType.SCISSORS)
                 || (attackerType == UnitType.SCISSORS && defenderType == UnitType.PAPER)
                 || (attackerType == UnitType.PAPER && defenderType == UnitType.ROCK)) {
-            winner = attacker;
+            return FightResult.ATTACKER_WINS;
         } else {
-            winner = defender;
+            return FightResult.DEFENDER_WINS;
         }
-        unitRepository.delete(winner == attacker ? defender : attacker);
-
-
-        winner.setVisible(true);
-        winner.setLocation(defender.getLocation());
-        unitRepository.save(winner);
-        return FightResult.WIN;
     }
 
     public void createUnitsForTeam(@NonNull String gameId, @NonNull Team team) {
@@ -76,6 +92,6 @@ public class UnitService {
     }
 
     public enum FightResult {
-        WIN, TIE
+        ATTACKER_WINS, DEFENDER_WINS, TIE
     }
 }

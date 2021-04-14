@@ -4,6 +4,7 @@ import info.seltenheim.ssponline.game.dto.*;
 import info.seltenheim.ssponline.game.model.Fight;
 import info.seltenheim.ssponline.game.model.GameState;
 import info.seltenheim.ssponline.game.model.Team;
+import info.seltenheim.ssponline.game.model.UnitType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,16 @@ public class GameController {
                             @RequestParam("requestingPlayer") Team team,
                             @RequestBody MoveUnitRequestDTO request) {
         gameService.moveUnit(gameId, request.getFrom(), request.getTo());
+
+        return toGameDTO(gameId, team);
+    }
+
+    @PostMapping("/game/{gameId}/fight/choose")
+    public GameDTO chooseUnitInFight(@PathVariable String gameId,
+                            @RequestParam("requestingPlayer") Team team,
+                            @RequestBody FightChoseUnitRequestDTO request) {
+
+        gameService.chooseUnitForFight(gameId, team, UnitType.valueOf(request.getUnitType().name()));
 
         return toGameDTO(gameId, team);
     }

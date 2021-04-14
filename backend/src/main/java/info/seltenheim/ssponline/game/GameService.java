@@ -48,15 +48,53 @@ public class GameService {
         }
 
         final var unitTo = unitToOptional.get();
-        final var fightResult = unitService.fight(unitFrom, unitTo);
+        final var fightResult = unitService.fightAfterMove(unitFrom, unitTo);
 
-        if (fightResult == FightResult.WIN) {
+        if (fightResult != FightResult.TIE) {
             toggleTeamsTurn(game);
         } else {
             enterTieMode(game, to);
         }
 
         return game;
+    }
+
+    public void chooseUnitForFight(@NonNull String gameId, @NonNull Team team, @NonNull UnitType type) {
+        final var game = gameRepository.findById(gameId).orElseThrow();
+        final var fight = fightRepository.findById(gameId).orElseThrow();
+        final var choice = fight.getChoiceForTeam(team);
+        if (choice != null) {
+            return;
+        }
+
+        fight.setChoiceForTeam(team, type);
+        if (fight.isBothUnitsSet()) {
+            final var fightResult = unitService.fight(fight.getRedChoice(), fight.getBlueChoice());
+
+            switch (fightResult) {
+                case ATTACKER_WINS:
+                    unitService.creatNewUnit(gameId, Team.RED, fight.getRedChoice(), fight.getLocation(), true);
+                    fightRepository.delete(fight);
+                    game.setGameState(GameState.TURN);
+                    final var nextTeam = game.getActiveTeam() == Team.RED ? Team.BLUE : Team.RED;
+                    game.setActiveTeam(nextTeam);
+                    gameRepository.save(game);
+                    break;
+                case DEFENDER_WINS:
+                    unitService.creatNewUnit(gameId, Team.BLUE, fight.getBlueChoice(), fight.getLocation(), true);
+                    fightRepository.delete(fight);
+                    game.setGameState(GameState.TURN);
+                    final var nextTeam2 = game.getActiveTeam() == Team.RED ? Team.BLUE : Team.RED;
+                    game.setActiveTeam(nextTeam2);
+                    gameRepository.save(game);
+                    break;
+                case TIE:
+                    fight.setRedChoice(null);
+                    fight.setBlueChoice(null);
+                    fightRepository.save(fight);
+                    break;
+            }
+        }
     }
 
     public Fight getFightForGame(String gameId) {

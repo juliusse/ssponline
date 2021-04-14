@@ -49,7 +49,8 @@ export class GameBoard extends React.Component {
             selectedField: null
         });
 
-        if (activeTeam !== this.team) {
+        if ((this.state.gameState !== GameState.FIGHT && activeTeam !== this.team) ||
+            (this.state.gameState === GameState.FIGHT && this.state.fightChoice != null)) {
             this.startCheck();
         } else {
             this.stopCheck();
@@ -139,8 +140,8 @@ export class GameBoard extends React.Component {
     handleFightUnitChosen(unitType) {
         axios({
             method: 'post',
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}/fight/chose`,
-            data: {unit: unitType.name},
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}/fight/choose`,
+            data: {unitType: unitType.api},
             params: {
                 requestingPlayer: this.team.api
             }
