@@ -1,10 +1,10 @@
 package info.seltenheim.ssponline.game;
 
-import info.seltenheim.ssponline.game.dto.GameDTO;
-import info.seltenheim.ssponline.game.dto.MoveUnitRequestDTO;
-import info.seltenheim.ssponline.game.dto.UnitDTO;
-import info.seltenheim.ssponline.game.dto.UnitTypeDTO;
+import info.seltenheim.ssponline.game.dto.*;
+import info.seltenheim.ssponline.game.model.Fight;
+import info.seltenheim.ssponline.game.model.GameState;
 import info.seltenheim.ssponline.game.model.Team;
+import info.seltenheim.ssponline.game.model.UnitType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +35,20 @@ public class GameController {
         return toGameDTO(gameId, team);
     }
 
+    @PostMapping("/game/{gameId}/fight/choose")
+    public GameDTO chooseUnitInFight(@PathVariable String gameId,
+                            @RequestParam("requestingPlayer") Team team,
+                            @RequestBody FightChoseUnitRequestDTO request) {
+
+        gameService.chooseUnitForFight(gameId, team, UnitType.valueOf(request.getUnitType().name()));
+
+        return toGameDTO(gameId, team);
+    }
+
     private GameDTO toGameDTO(String gameId, Team requestingTeam) {
         final var game = gameService.getGame(gameId);
         final var units = unitService.getUnitsForGame(gameId);
+        final var fight = game.getGameState() == GameState.FIGHT ? gameService.getFightForGame(gameId) : null;
         units.forEach(entityManager::refresh);
 
         final var unitDTOs = units
@@ -55,7 +66,19 @@ public class GameController {
                 game.getId(),
                 game.getActiveTeam(),
                 game.getGameState(),
-                unitDTOs
+                unitDTOs,
+                toFightDTO(fight, requestingTeam)
         );
+    }
+
+    private FightDTO toFightDTO(Fight fight, Team requestingTeam) {
+        if (fight == null) {
+            return null;
+        }
+
+        final var unit = requestingTeam == Team.RED ? fight.getRedChoice() : fight.getBlueChoice();
+        final var unitDto = unit != null ? UnitTypeDTO.valueOf(unit.name()) : null;
+
+        return new FightDTO(fight.getLocation(), unitDto);
     }
 }
