@@ -15,11 +15,7 @@ import java.util.List;
 @Repository
 public interface GameActionRepository extends JpaRepository<GameAction, String> {
 
-    @Query("SELECT max(ga.actionId) " +
-            "FROM info.seltenheim.ssponline.game.model.GameAction ga " +
-            "WHERE ga.gameId = :gameId " +
-            "GROUP BY ga.gameId")
-    Long findFirstByGameIdOrderByActionIdActionIdDesc(String gameId);
+    GameAction findFirstByGameIdOrderByActionIdDesc(String gameId);
 
     List<GameAction> findAllByGameIdOrderByActionIdAsc(String gameId);
 }

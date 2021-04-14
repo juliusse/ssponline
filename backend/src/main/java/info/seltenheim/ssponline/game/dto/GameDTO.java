@@ -1,9 +1,6 @@
 package info.seltenheim.ssponline.game.dto;
 
-import info.seltenheim.ssponline.game.model.Fight;
-import info.seltenheim.ssponline.game.model.GameState;
-import info.seltenheim.ssponline.game.model.Point;
-import info.seltenheim.ssponline.game.model.Team;
+import info.seltenheim.ssponline.game.dto.action.response.GameActionResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class GameDTO {
     private String id;
-    private List<GameActionDTO> gameActions;
+    private List<GameActionResponseDTO> gameActions;
 }

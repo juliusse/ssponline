@@ -1,4 +1,4 @@
-package info.seltenheim.ssponline.game.dto;
+package info.seltenheim.ssponline.game.dto.action.response;
 
 import info.seltenheim.ssponline.game.model.GameActionType;
 import info.seltenheim.ssponline.game.model.GameState;
@@ -9,5 +9,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class GameActionConfigureDTO extends GameActionDTO {
+@AllArgsConstructor
+public class GameActionResponseDTO {
+    private String gameId;
+    private Long actionId;
+    private GameActionType actionType;
+    private Team activeTeam;
+    private GameState gameState;
 }

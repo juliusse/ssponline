@@ -1,6 +1,8 @@
 package info.seltenheim.ssponline.game;
 
 import info.seltenheim.ssponline.game.UnitService.FightResult;
+import info.seltenheim.ssponline.game.dto.action.request.GameActionMoveRequestDTO;
+import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
 import info.seltenheim.ssponline.game.model.*;
 import info.seltenheim.ssponline.game.repository.FightRepository;
 import info.seltenheim.ssponline.game.repository.GameActionRepository;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,5 +150,29 @@ public class GameService {
                 gameActionUnitRepository.save(new GameActionUnit(action, x, y + startY, team, type, false));
             }
         }
+    }
+
+    public void processAction(String gameId, Team team, GameActionRequestDTO request) {
+        if(request instanceof GameActionMoveRequestDTO) {
+            processActionMove(gameId, team, (GameActionMoveRequestDTO) request);
+        }
+    }
+
+    private void processActionMove(String gameId, Team team, GameActionMoveRequestDTO request) {
+        final var lastAction = gameActionRepository.findFirstByGameIdOrderByActionIdDesc(gameId);
+        if(lastAction.getActiveTeam() != team) {
+            throw new IllegalStateException();
+        }
+
+        final var nextTeam = team == Team.RED ? Team.BLUE : Team.RED;
+
+        final var action = new GameActionMove(
+                gameId,
+                lastAction.getActionId() + 1,
+                nextTeam,
+                request.getFrom(),
+                request.getTo());
+
+        gameActionRepository.save(action);
     }
 }

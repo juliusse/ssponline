@@ -38,7 +38,11 @@ export class GameBoard extends React.Component {
     }
 
     processActions(response) {
-        response.data.gameActions.map(this.processAction.bind(this));
+        response.data.gameActions.map(action => {
+            if (action.actionId > this.lastProcessedAction) {
+                this.processAction(action);
+            }
+        });
     }
 
     processAction(action) {
@@ -48,8 +52,10 @@ export class GameBoard extends React.Component {
             this.processActionShuffleUnits(action);
         } else if (action.actionType === 'ACCEPT_UNITS') {
             this.processActionAcceptTurn(action);
-        } else if (action.actionType === 'SHUFFLE_UNITS') {
+        } else if (action.actionType === 'START') {
             this.processActionGameStart(action);
+        } else if (action.actionType === 'MOVE') {
+            this.processActionMove(action);
         }
 
         this.setState({
@@ -57,6 +63,13 @@ export class GameBoard extends React.Component {
             gameState: GameState[action.gameState]
         })
         this.lastProcessedAction = action.actionId;
+
+        if ((this.state.gameState !== GameState.FIGHT && this.state.activeTeam !== this.team) ||
+            (this.state.gameState === GameState.FIGHT && this.state.fightChoice != null)) {
+            this.startCheck();
+        } else {
+            this.stopCheck();
+        }
     }
 
     processActionConfigure(configureAction) {
@@ -94,6 +107,22 @@ export class GameBoard extends React.Component {
         // todo
     }
 
+    processActionMove(moveAction) {
+        const board = this.state.board;
+        const unit = board[moveAction.from.y][moveAction.from.x];
+
+        board[moveAction.from.y][moveAction.from.x] = null;
+        board[moveAction.to.y][moveAction.to.x] = unit;
+
+        this.setState({board});
+    }
+
+    processActionFight(fightAction) {
+        if (fight) {
+            fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
+        }
+    }
+
     isMyTurn() {
         return this.state.requestingPlayer === this.state.activeTeam;
     }
@@ -122,45 +151,13 @@ export class GameBoard extends React.Component {
             selectedField: null
         });
 
-        if ((this.state.gameState !== GameState.FIGHT && activeTeam !== this.team) ||
-            (this.state.gameState === GameState.FIGHT && this.state.fightChoice != null)) {
-            this.startCheck();
-        } else {
-            this.stopCheck();
-        }
-    }
 
-    reloadBoard() {
-        axios({
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
-            params: {
-                requestingPlayer: this.team.api
-            }
-        }).then(this.handleBoardResponse.bind(this))
     }
 
     generateBoard(units, fight) {
-        const fields = [];
-        fields.push([null, null, null, null, null, null, null]);
-        fields.push([null, null, null, null, null, null, null]);
-        fields.push([null, null, null, null, null, null, null]);
-        fields.push([null, null, null, null, null, null, null]);
-        fields.push([null, null, null, null, null, null, null]);
-        fields.push([null, null, null, null, null, null, null]);
-
-        units.forEach(unit => {
-            const team = Team[unit.team];
-            const type = UnitType[unit.type];
-            const visible = UnitType[unit.visible];
-            const model = new UnitModel({team, type, visible})
-            fields[unit.location.y][unit.location.x] = model;
-        })
-
         if (fight) {
             fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
         }
-
-        return fields;
     }
 
     isAdjacentToSelectedField(otherField) {
@@ -172,12 +169,12 @@ export class GameBoard extends React.Component {
     moveUnit(from, to) {
         axios({
             method: 'post',
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}/move`,
-            data: {from, to},
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}/action`,
+            data: {actionType: 'MOVE', from, to},
             params: {
                 requestingPlayer: this.team.api
             }
-        }).then(this.handleBoardResponse.bind(this))
+        }).then(this.processActions.bind(this))
     }
 
     handleFieldClick({x, y}) {

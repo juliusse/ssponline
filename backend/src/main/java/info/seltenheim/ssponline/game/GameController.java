@@ -1,6 +1,8 @@
 package info.seltenheim.ssponline.game;
 
 import info.seltenheim.ssponline.game.dto.*;
+import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
+import info.seltenheim.ssponline.game.dto.action.response.*;
 import info.seltenheim.ssponline.game.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Isolation;
@@ -20,6 +22,15 @@ public class GameController {
 
     @GetMapping("/game/{gameId}")
     public GameDTO getGame(@PathVariable String gameId, @RequestParam("requestingPlayer") Team team) {
+        return toGameDTO(gameId, team);
+    }
+
+    @PostMapping("/game/{gameId}/action")
+    public GameDTO getGame(@PathVariable String gameId,
+                           @RequestParam("requestingPlayer") Team team,
+                           @RequestBody GameActionRequestDTO request) {
+
+        gameService.processAction(gameId, team, request);
         return toGameDTO(gameId, team);
     }
 
@@ -57,11 +68,11 @@ public class GameController {
         );
     }
 
-    private GameActionDTO toGameActionDTO(GameAction gameAction, Team requestingTeam) {
-        GameActionDTO gameActionDTO = null;
+    private GameActionResponseDTO toGameActionDTO(GameAction gameAction, Team requestingTeam) {
+        GameActionResponseDTO gameActionResponseDTO = null;
 
         if (gameAction instanceof GameActionConfigure) {
-            gameActionDTO = new GameActionConfigureDTO();
+            gameActionResponseDTO = new GameActionResponseConfigureDTO();
         }
 
         if (gameAction instanceof GameActionShuffleUnits) {
@@ -73,25 +84,31 @@ public class GameController {
                         final var unitType = isMyUnit || isUncovered ?
                                 UnitTypeDTO.valueOf(unit.getType().name()) :
                                 UnitTypeDTO.HIDDEN;
-                        return new GameActionUnitDTO(unit.getTeam(), unitType, unit.getLocation(), unit.isVisible());
+                        return new GameActionResponseUnitDTO(unit.getTeam(), unitType, unit.getLocation(), unit.isVisible());
                     })
                     .collect(Collectors.toList());
 
-            gameActionDTO = new GameActionShuffleUnitsDTO()
+            gameActionResponseDTO = new GameActionResponseShuffleUnitsDTO()
                     .setTeam(((GameActionShuffleUnits) gameAction).getTeam())
                     .setUnits(unitDTOs);
         }
 
         if (gameAction instanceof GameActionAcceptUnits) {
-            gameActionDTO = new GameActionAcceptUnitsDTO()
+            gameActionResponseDTO = new GameActionResponseAcceptUnitsDTO()
                     .setTeam(((GameActionAcceptUnits) gameAction).getTeam());
         }
 
         if (gameAction instanceof GameActionStart) {
-            gameActionDTO = new GameActionStartDTO();
+            gameActionResponseDTO = new GameActionResponseStartDTO();
         }
 
-        return gameActionDTO
+        if (gameAction instanceof GameActionMove) {
+            gameActionResponseDTO = new GameActionResponseMoveDTO()
+                    .setFrom(((GameActionMove) gameAction).getFrom())
+                    .setTo(((GameActionMove) gameAction).getTo());
+        }
+
+        return gameActionResponseDTO
                 .setGameId(gameAction.getGameId())
                 .setActionId(gameAction.getActionId())
                 .setActionType(gameAction.getActionType())

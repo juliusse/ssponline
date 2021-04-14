@@ -1,4 +1,4 @@
-package info.seltenheim.ssponline.game.dto;
+package info.seltenheim.ssponline.game.dto.action.response;
 
 import info.seltenheim.ssponline.game.model.Team;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameActionAcceptUnitsDTO extends GameActionDTO {
+public class GameActionResponseShuffleUnitsDTO extends GameActionResponseDTO {
     private Team team;
+    private List<GameActionResponseUnitDTO> units;
 }
