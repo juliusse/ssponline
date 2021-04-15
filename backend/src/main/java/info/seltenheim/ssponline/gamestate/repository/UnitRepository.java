@@ -22,6 +22,15 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
     @Query("UPDATE info.seltenheim.ssponline.gamestate.model.Unit u SET u.location = :newLocation WHERE u.id = :id")
     void updateUnitLocation(Long id, Point newLocation);
 
+    @Modifying
+    @Query("UPDATE info.seltenheim.ssponline.gamestate.model.Unit u " +
+            "SET u.location = :to " +
+            "WHERE u.gameId = :gameId " +
+            "AND u.location = :from")
+    void updateUnitLocation(String gameId, Point from, Point to);
+
     // delete
     void deleteAllByGameIdAndTeam(String gameId, Team team);
+
+    void deleteByGameIdAndLocation(String gameId, Point location);
 }

@@ -31,8 +31,8 @@ public class GameActionMove extends GameAction {
         return new Point(toX, toY);
     }
 
-    public GameActionMove(String gameId, Long actionId, Team newactiveteam, Point from, Point to) {
-        super(gameId, actionId, GameActionType.MOVE, newactiveteam, GameState.TURN);
+    public GameActionMove(String gameId, Long actionId, Team newActiveTeam, GameState newGameState, Point from, Point to) {
+        super(gameId, actionId, GameActionType.MOVE, newActiveTeam, newGameState);
         this.fromX = from.getX();
         this.fromY = from.getY();
         this.toX = to.getX();

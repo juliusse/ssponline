@@ -1,6 +1,7 @@
 package info.seltenheim.ssponline.game;
 
-import info.seltenheim.ssponline.game.dto.*;
+import info.seltenheim.ssponline.game.dto.GameDTO;
+import info.seltenheim.ssponline.game.dto.UnitTypeDTO;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
 import info.seltenheim.ssponline.game.dto.action.response.*;
 import info.seltenheim.ssponline.game.model.*;
@@ -79,14 +80,7 @@ public class GameController {
         if (gameAction instanceof GameActionShuffleUnits) {
             final var unitDTOs = ((GameActionShuffleUnits) gameAction).getUnits()
                     .stream()
-                    .map(unit -> {
-                        final var isMyUnit = requestingTeam == unit.getTeam();
-                        final var isUncovered = unit.isVisible();
-                        final var unitType = isMyUnit || isUncovered ?
-                                UnitTypeDTO.valueOf(unit.getType().name()) :
-                                UnitTypeDTO.HIDDEN;
-                        return new GameActionResponseUnitDTO(unit.getTeam(), unitType, unit.getLocation(), unit.isVisible());
-                    })
+                    .map(unit -> toUnitDTO(unit, requestingTeam))
                     .collect(Collectors.toList());
 
             gameActionResponseDTO = new GameActionResponseShuffleUnitsDTO()
@@ -109,6 +103,15 @@ public class GameController {
                     .setTo(((GameActionMove) gameAction).getTo());
         }
 
+        if (gameAction instanceof GameActionFight) {
+            final var fightAction = (GameActionFight) gameAction;
+            gameActionResponseDTO = new GameActionResponseFightDTO()
+                    .setLocation(fightAction.getLocation())
+                    .setRedType(toUnitTypeDTO(fightAction.getRedType(), Team.RED, requestingTeam, true))
+                    .setBlueType(toUnitTypeDTO(fightAction.getBlueType(), Team.BLUE, requestingTeam, true))
+                    .setWinningTeam(fightAction.getWinningTeam());
+        }
+
         return gameActionResponseDTO
                 .setGameId(gameAction.getGameId())
                 .setActionId(gameAction.getActionId())
@@ -116,6 +119,17 @@ public class GameController {
                 .setActiveTeam(gameAction.getActiveTeam())
                 .setGameState(gameAction.getGameState());
     }
+
+    private GameActionResponseUnitDTO toUnitDTO(GameActionUnit unit, Team requestingTeam) {
+        final var unitType = toUnitTypeDTO(unit.getType(), unit.getTeam(), requestingTeam, unit.isVisible());
+        return new GameActionResponseUnitDTO(unit.getTeam(), unitType, unit.getLocation(), unit.isVisible());
+    }
+
+    private UnitTypeDTO toUnitTypeDTO(UnitType unitType, Team unitTeam, Team requestingTeam, boolean isVisible) {
+        final var isMyUnit = requestingTeam == unitTeam;
+        return isMyUnit || isVisible ? UnitTypeDTO.valueOf(unitType.name()) : UnitTypeDTO.HIDDEN;
+    }
+
 //
 //    private FightDTO toFightDTO(Fight fight, Team requestingTeam) {
 //        if (fight == null) {

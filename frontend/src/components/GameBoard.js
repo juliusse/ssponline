@@ -56,6 +56,8 @@ export class GameBoard extends React.Component {
             this.processActionGameStart(action);
         } else if (action.actionType === 'MOVE') {
             this.processActionMove(action);
+        } else if (action.actionType === 'FIGHT') {
+            this.processActionFight(action);
         }
 
         this.setState({
@@ -118,9 +120,18 @@ export class GameBoard extends React.Component {
     }
 
     processActionFight(fightAction) {
-        // if (fight) {
-        //     fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
-        // }
+        const board = this.state.board;
+
+        if (fightAction.winningTeam != null) {
+            const winningTeam = Team[fightAction.winningTeam];
+            const winningUnit = fightAction.winningTeam === 'RED' ? fightAction.redType : fightAction.blueType;
+            const model = new UnitModel({team: winningTeam, type: UnitType[winningUnit], visible: true})
+            board[fightAction.location.y][fightAction.location.x] = model;
+        } else {
+            board[fightAction.location.y][fightAction.location.x] = new UnitModel({type: UnitType.FIGHT});
+        }
+
+        this.setState({board});
     }
 
     isMyTurn() {

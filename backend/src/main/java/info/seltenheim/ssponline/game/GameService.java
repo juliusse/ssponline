@@ -7,13 +7,13 @@ import info.seltenheim.ssponline.game.repository.GameActionRepository;
 import info.seltenheim.ssponline.game.repository.GameActionUnitRepository;
 import info.seltenheim.ssponline.game.repository.GameRepository;
 import info.seltenheim.ssponline.gamestate.GameStateService;
+import info.seltenheim.ssponline.gamestate.UnitService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,6 @@ public class GameService {
     private final GameActionRepository gameActionRepository;
     private final GameActionUnitRepository gameActionUnitRepository;
     private final GameStateService gameStateService;
-    private final EntityManager entityManager;
 
     public Game getGame(@NonNull String id) {
         return gameRepository
@@ -179,19 +178,74 @@ public class GameService {
         final var unitFrom = gameStateService.findUnitInLocation(gameId, request.getFrom()).orElseThrow();
         final var unitToOptional = gameStateService.findUnitInLocation(gameId, request.getTo());
 
-        if (unitToOptional.isEmpty()) {
-            final var action = new GameActionMove(
+        final var nextState = unitToOptional.isEmpty() ? GameState.TURN : GameState.FIGHT;
+
+        final var action = new GameActionMove(
+                gameId,
+                lastAction.getActionId() + 1,
+                getOtherTeam(team),
+                nextState,
+                request.getFrom(),
+                request.getTo());
+        gameActionRepository.save(action);
+        gameStateService.processAction(action);
+
+
+        // fight
+        if (nextState == GameState.FIGHT) {
+            final var unitTo = unitToOptional.get();
+            final var winner = fight(unitFrom.getType(), unitTo.getType());
+            final var redUnit = unitFrom.getTeam() == Team.RED ? unitFrom.getType() : unitTo.getType();
+            final var blueUnit = unitFrom.getTeam() == Team.BLUE ? unitFrom.getType() : unitTo.getType();
+
+            if (winner == UnitService.FightResult.TIE) {
+                final var fightAction = new GameActionFight(
+                        gameId,
+                        lastAction.getActionId() + 2,
+                        action.getActiveTeam(),
+                        GameState.TURN,
+                        unitTo.getLocation(),
+                        redUnit,
+                        blueUnit,
+                        null);
+                gameActionRepository.save(fightAction);
+                gameStateService.processAction(fightAction);
+                return;
+            }
+
+            final var winningTeam = winner == UnitService.FightResult.ATTACKER_WINS ? unitFrom.getTeam() : unitTo.getTeam();
+            final var fightAction = new GameActionFight(
                     gameId,
-                    lastAction.getActionId() + 1,
-                    getOtherTeam(team),
-                    request.getFrom(),
-                    request.getTo());
-            gameActionRepository.save(action);
-            gameStateService.processAction(action);
+                    lastAction.getActionId() + 2,
+                    action.getActiveTeam(),
+                    GameState.TURN,
+                    unitTo.getLocation(),
+                    redUnit,
+                    blueUnit,
+                    winningTeam);
+            gameActionRepository.save(fightAction);
+            gameStateService.processAction(fightAction);
         }
+
     }
 
     private Team getOtherTeam(Team team) {
         return team == Team.RED ? Team.BLUE : Team.RED;
+    }
+
+    public UnitService.FightResult fight(UnitType attackerType, UnitType defenderType) {
+        if (attackerType == defenderType) {
+            return UnitService.FightResult.TIE;
+        } else if (defenderType == UnitType.FLAG) {
+            return UnitService.FightResult.ATTACKER_WINS;
+        } else if (defenderType == UnitType.TRAP) {
+            return UnitService.FightResult.DEFENDER_WINS;
+        } else if ((attackerType == UnitType.ROCK && defenderType == UnitType.SCISSORS)
+                || (attackerType == UnitType.SCISSORS && defenderType == UnitType.PAPER)
+                || (attackerType == UnitType.PAPER && defenderType == UnitType.ROCK)) {
+            return UnitService.FightResult.ATTACKER_WINS;
+        } else {
+            return UnitService.FightResult.DEFENDER_WINS;
+        }
     }
 }

@@ -60,7 +60,7 @@ public class UnitService {
     }
 
     public FightResult fight(UnitType attackerType, UnitType defenderType) {
-        if(attackerType == defenderType) {
+        if (attackerType == defenderType) {
             return FightResult.TIE;
         } else if (defenderType == UnitType.FLAG) {
             return FightResult.ATTACKER_WINS;
@@ -82,6 +82,14 @@ public class UnitService {
             final var unit = new Unit(gameId, team, gameActionUnit.getType(), gameActionUnit.getLocation(), gameActionUnit.isVisible());
             unitRepository.save(unit);
         });
+    }
+
+    public void deleteUnitAtLocation(String gameId, Point location) {
+        unitRepository.deleteByGameIdAndLocation(gameId, location);
+    }
+
+    public void moveUnit(String gameId, Point from, Point to) {
+        unitRepository.updateUnitLocation(gameId, from, to);
     }
 
     public enum FightResult {

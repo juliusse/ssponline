@@ -35,6 +35,9 @@ public class GameStateService {
             case MOVE:
                 gameState = processMove((GameActionMove) action);
                 break;
+            case FIGHT:
+                gameState = processFight((GameActionFight) action);
+                break;
             case ACCEPT_UNITS:
             case START:
             default:
@@ -65,18 +68,26 @@ public class GameStateService {
         final var from = action.getFrom();
         final var to = action.getTo();
 
-        final var gameState = gameRepository.findById(gameId)
-                .orElseThrow();
-        final var unitFrom = unitService.findUnitInLocation(gameId, from)
-                .orElseThrow();
+        switch (action.getGameState()) {
+            case TURN:
+                unitService.moveUnit(gameId, from, to);
+                break;
+            case FIGHT:
+                unitService.deleteUnitAtLocation(gameId, from);
+                unitService.deleteUnitAtLocation(gameId, to);
+                break;
+        }
+        return gameRepository.findById(gameId).orElseThrow();
+//        final var unitFrom = unitService.findUnitInLocation(gameId, from)
+//                .orElseThrow();
 //        final var unitToOptional = unitService.findUnitInLocation(gameId, to);
 
 
         // normal move
 //        if (unitToOptional.isEmpty()) {
-        unitService.updateUnitPosition(unitFrom.getId(), to);
+//        unitService.updateUnitPosition(unitFrom.getId(), to);
 //            toggleTeamsTurn(gameState);
-        return gameState;
+//        return gameState;
 //        }
 
 //        // fight state
@@ -91,6 +102,15 @@ public class GameStateService {
 //        }
 //
 //        return game;
+    }
+
+    private GameState processFight(GameActionFight action) {
+        if (action.getWinningTeam() != null) {
+            final var winningUnit = action.getWinningTeam() == Team.RED ? action.getRedType() : action.getBlueType();
+            unitService.creatNewUnit(action.getGameId(), action.getWinningTeam(), winningUnit, action.getLocation(), true);
+        }
+
+        return gameRepository.findById(action.getGameId()).orElseThrow();
     }
 
     public Optional<Unit> findUnitInLocation(@NonNull String gameId, @NonNull Point location) {
