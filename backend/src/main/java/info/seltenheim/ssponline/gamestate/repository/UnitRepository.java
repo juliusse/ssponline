@@ -1,8 +1,8 @@
-package info.seltenheim.ssponline.game.repository;
+package info.seltenheim.ssponline.gamestate.repository;
 
 import info.seltenheim.ssponline.game.model.Point;
 import info.seltenheim.ssponline.game.model.Team;
-import info.seltenheim.ssponline.game.model.Unit;
+import info.seltenheim.ssponline.gamestate.model.Unit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +19,7 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
 
     // update
     @Modifying
-    @Query("UPDATE info.seltenheim.ssponline.game.model.Unit u SET u.location = :newLocation WHERE u.id = :id")
+    @Query("UPDATE info.seltenheim.ssponline.gamestate.model.Unit u SET u.location = :newLocation WHERE u.id = :id")
     void updateUnitLocation(Long id, Point newLocation);
 
     // delete

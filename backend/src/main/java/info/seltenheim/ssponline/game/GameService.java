@@ -1,20 +1,19 @@
 package info.seltenheim.ssponline.game;
 
-import info.seltenheim.ssponline.game.UnitService.FightResult;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionMoveRequestDTO;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
 import info.seltenheim.ssponline.game.model.*;
-import info.seltenheim.ssponline.game.repository.FightRepository;
 import info.seltenheim.ssponline.game.repository.GameActionRepository;
 import info.seltenheim.ssponline.game.repository.GameActionUnitRepository;
 import info.seltenheim.ssponline.game.repository.GameRepository;
+import info.seltenheim.ssponline.gamestate.GameStateService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +25,8 @@ public class GameService {
     private final GameRepository gameRepository;
     private final GameActionRepository gameActionRepository;
     private final GameActionUnitRepository gameActionUnitRepository;
-    private final FightRepository fightRepository;
-    private final UnitService unitService;
+    private final GameStateService gameStateService;
+    private final EntityManager entityManager;
 
     public Game getGame(@NonNull String id) {
         return gameRepository
@@ -45,13 +44,21 @@ public class GameService {
 
 
         final var game = gameRepository.save(new Game(id));
-        gameActionRepository.save(new GameActionConfigure(id, 0L));
+        gameStateService.processAction(
+                gameActionRepository.save(new GameActionConfigure(id, 0L))
+        );
 
         createShuffleAction(id, 1L, Team.RED);
         createShuffleAction(id, 2L, Team.BLUE);
-        gameActionRepository.save(new GameActionAcceptUnits(id, 3L, Team.RED));
-        gameActionRepository.save(new GameActionAcceptUnits(id, 4L, Team.BLUE));
-        gameActionRepository.save(new GameActionStart(id, 5L, Team.RED));
+        gameStateService.processAction(
+                gameActionRepository.save(new GameActionAcceptUnits(id, 3L, Team.RED))
+        );
+        gameStateService.processAction(
+                gameActionRepository.save(new GameActionAcceptUnits(id, 4L, Team.BLUE))
+        );
+        gameStateService.processAction(
+                gameActionRepository.save(new GameActionStart(id, 5L, Team.RED))
+        );
 
         return game;
     }
@@ -119,9 +126,9 @@ public class GameService {
 //        }
 //    }
 
-    public Fight getFightForGame(String gameId) {
-        return fightRepository.findById(gameId).orElseThrow();
-    }
+//    public Fight getFightForGame(String gameId) {
+//        return fightRepository.findById(gameId).orElseThrow();
+//    }
 
 //    private void toggleTeamsTurn(Game game) {
 //        final var nextTeam = game.getActiveTeam() == Team.RED ? Team.BLUE : Team.RED;
@@ -143,36 +150,48 @@ public class GameService {
 
         final int startY = team == Team.RED ? 0 : 4;
 
+        final var units = new ArrayList<GameActionUnit>();
         for (int y = 0; y < 2; y++) {
             for (int x = 0; x < 7; x++) {
                 final var type = allowedFigures[(int) (Math.random() * 3)];
-
-                gameActionUnitRepository.save(new GameActionUnit(action, x, y + startY, team, type, false));
+                final var unit = new GameActionUnit(action, x, y + startY, team, type, false);
+                gameActionUnitRepository.save(unit);
+                units.add(unit);
             }
         }
+
+        action.setUnits(units);
+        gameStateService.processAction(action);
     }
 
     public void processAction(String gameId, Team team, GameActionRequestDTO request) {
-        if(request instanceof GameActionMoveRequestDTO) {
+        if (request instanceof GameActionMoveRequestDTO) {
             processActionMove(gameId, team, (GameActionMoveRequestDTO) request);
         }
     }
 
     private void processActionMove(String gameId, Team team, GameActionMoveRequestDTO request) {
         final var lastAction = gameActionRepository.findFirstByGameIdOrderByActionIdDesc(gameId);
-        if(lastAction.getActiveTeam() != team) {
+        if (lastAction.getActiveTeam() != team) {
             throw new IllegalStateException();
         }
 
-        final var nextTeam = team == Team.RED ? Team.BLUE : Team.RED;
+        final var unitFrom = gameStateService.findUnitInLocation(gameId, request.getFrom()).orElseThrow();
+        final var unitToOptional = gameStateService.findUnitInLocation(gameId, request.getTo());
 
-        final var action = new GameActionMove(
-                gameId,
-                lastAction.getActionId() + 1,
-                nextTeam,
-                request.getFrom(),
-                request.getTo());
+        if (unitToOptional.isEmpty()) {
+            final var action = new GameActionMove(
+                    gameId,
+                    lastAction.getActionId() + 1,
+                    getOtherTeam(team),
+                    request.getFrom(),
+                    request.getTo());
+            gameActionRepository.save(action);
+            gameStateService.processAction(action);
+        }
+    }
 
-        gameActionRepository.save(action);
+    private Team getOtherTeam(Team team) {
+        return team == Team.RED ? Team.BLUE : Team.RED;
     }
 }

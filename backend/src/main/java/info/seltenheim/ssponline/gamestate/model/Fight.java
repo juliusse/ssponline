@@ -1,5 +1,8 @@
-package info.seltenheim.ssponline.game.model;
+package info.seltenheim.ssponline.gamestate.model;
 
+import info.seltenheim.ssponline.game.model.Point;
+import info.seltenheim.ssponline.game.model.Team;
+import info.seltenheim.ssponline.game.model.UnitType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,7 +10,7 @@ import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
-@Entity(name = "fight")
+@Entity(name = "game_state_fight")
 public class Fight {
 
     @Id

@@ -38,7 +38,7 @@ export class GameBoard extends React.Component {
     }
 
     processActions(response) {
-        response.data.gameActions.map(action => {
+        response.data.gameActions.forEach(action => {
             if (action.actionId > this.lastProcessedAction) {
                 this.processAction(action);
             }
@@ -88,7 +88,7 @@ export class GameBoard extends React.Component {
         const board = this.state.board;
         shuffleUnitsAction
             .units
-            .map(unit => {
+            .forEach(unit => {
                 const team = Team[unit.team];
                 const type = UnitType[unit.type];
                 const visible = UnitType[unit.visible];
@@ -118,9 +118,9 @@ export class GameBoard extends React.Component {
     }
 
     processActionFight(fightAction) {
-        if (fight) {
-            fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
-        }
+        // if (fight) {
+        //     fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
+        // }
     }
 
     isMyTurn() {
@@ -155,9 +155,9 @@ export class GameBoard extends React.Component {
     }
 
     generateBoard(units, fight) {
-        if (fight) {
-            fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
-        }
+        // if (fight) {
+        //     fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
+        // }
     }
 
     isAdjacentToSelectedField(otherField) {

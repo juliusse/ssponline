@@ -4,6 +4,7 @@ import info.seltenheim.ssponline.game.dto.*;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
 import info.seltenheim.ssponline.game.dto.action.response.*;
 import info.seltenheim.ssponline.game.model.*;
+import info.seltenheim.ssponline.gamestate.UnitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,15 +116,15 @@ public class GameController {
                 .setActiveTeam(gameAction.getActiveTeam())
                 .setGameState(gameAction.getGameState());
     }
-
-    private FightDTO toFightDTO(Fight fight, Team requestingTeam) {
-        if (fight == null) {
-            return null;
-        }
-
-        final var unit = requestingTeam == Team.RED ? fight.getRedChoice() : fight.getBlueChoice();
-        final var unitDto = unit != null ? UnitTypeDTO.valueOf(unit.name()) : null;
-
-        return new FightDTO(fight.getLocation(), unitDto);
-    }
+//
+//    private FightDTO toFightDTO(Fight fight, Team requestingTeam) {
+//        if (fight == null) {
+//            return null;
+//        }
+//
+//        final var unit = requestingTeam == Team.RED ? fight.getRedChoice() : fight.getBlueChoice();
+//        final var unitDto = unit != null ? UnitTypeDTO.valueOf(unit.name()) : null;
+//
+//        return new FightDTO(fight.getLocation(), unitDto);
+//    }
 }
