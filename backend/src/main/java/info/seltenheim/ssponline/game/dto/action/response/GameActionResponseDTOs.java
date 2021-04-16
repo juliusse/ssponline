@@ -6,7 +6,8 @@ import info.seltenheim.ssponline.game.model.*;
 import java.util.stream.Collectors;
 
 public class GameActionResponseDTOs {
-    private GameActionResponseDTOs() { }
+    private GameActionResponseDTOs() {
+    }
 
     public static GameActionResponseDTO toGameActionDTO(GameAction gameAction, Team requestingTeam) {
         GameActionResponseDTO gameActionResponseDTO = null;
@@ -29,6 +30,17 @@ public class GameActionResponseDTOs {
         if (gameAction instanceof GameActionAcceptUnits) {
             gameActionResponseDTO = new GameActionResponseAcceptUnitsDTO()
                     .setTeam(((GameActionAcceptUnits) gameAction).getTeam());
+        }
+
+        if (gameAction instanceof GameActionSetSpecialUnits) {
+            final var unitDTOs = ((GameActionSetSpecialUnits) gameAction).getUnits()
+                    .stream()
+                    .filter(unit -> unit.getTeam() == requestingTeam)
+                    .map(unit -> toUnitDTO(unit, requestingTeam))
+                    .collect(Collectors.toList());
+
+            gameActionResponseDTO = new GameActionSetSpecialUnitsResponseDTO()
+                    .setUnits(unitDTOs);
         }
 
         if (gameAction instanceof GameActionStart) {

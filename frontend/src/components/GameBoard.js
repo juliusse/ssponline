@@ -102,6 +102,7 @@ export class GameBoard extends React.Component {
 
         // clicking on own unit
         if (unit !== null &&
+            unit.type.isMovable &&
             unit.team === this.team &&
             this.team === gameState.activeTeam &&
             gameState.gameState === GameState.TURN) {

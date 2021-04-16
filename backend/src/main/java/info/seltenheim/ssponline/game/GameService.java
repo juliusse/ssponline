@@ -60,6 +60,8 @@ public class GameService {
             processShuffleUnitsAction(gameId, team, lastAction, (GameActionShuffleUnitsRequestDTO) request);
         } else if (request instanceof GameActionAcceptUnitsRequestDTO) {
             processAcceptUnitsAction(gameId, team, lastAction, (GameActionAcceptUnitsRequestDTO) request);
+        } else if (request instanceof GameActionSetSpecialUnitsRequestDTO) {
+            processActionSetSpecialUnits(gameId, team, lastAction, (GameActionSetSpecialUnitsRequestDTO) request);
         } else if (request instanceof GameActionMoveRequestDTO) {
             processActionMove(gameId, team, lastAction, (GameActionMoveRequestDTO) request);
         } else if (request instanceof GameActionFightChooseUnitRequestDTO) {
@@ -95,15 +97,46 @@ public class GameService {
     }
 
     private void processAcceptUnitsAction(String gameId, Team team, GameAction lastAction, GameActionAcceptUnitsRequestDTO request) {
-        final var gameState = gameStateService.processAction(
-                gameActionRepository.save(new GameActionAcceptUnits(gameId, lastAction.getActionId() + 1, team))
-        );
+        final var action = gameActionRepository.save(new GameActionAcceptUnits(gameId, lastAction.getActionId() + 1, team));
+        final var gameState = gameStateService.processAction(action);
 
-        if(gameState.isRedAcceptedUnits() && gameState.isBlueAcceptedUnits()) {
+        if (gameState.isRedAcceptedUnits() && gameState.isBlueAcceptedUnits()) {
+            final var redAcceptAction =
+                    processActionSetSpecialUnits(gameId, Team.RED, action, new GameActionSetSpecialUnitsRequestDTO()
+                            .setFlag(new Point(3, 0))
+                            .setTrap1(new Point(2, 1))
+                            .setTrap2(new Point(5, 1)));
+            processActionSetSpecialUnits(gameId, Team.BLUE, redAcceptAction, new GameActionSetSpecialUnitsRequestDTO()
+                    .setFlag(new Point(3, 5))
+                    .setTrap1(new Point(2, 4))
+                    .setTrap2(new Point(5, 4)));
+
+
+        }
+    }
+
+    private GameActionSetSpecialUnits processActionSetSpecialUnits(String gameId, Team team, GameAction lastAction, GameActionSetSpecialUnitsRequestDTO request) {
+        final var action = gameActionRepository.save(new GameActionSetSpecialUnits(gameId, lastAction.getActionId() + 1, team));
+        final var trap1 = request.getTrap1();
+        final var trap2 = request.getTrap2();
+        final var flag = request.getFlag();
+
+        final var units = new ArrayList<GameActionUnit>();
+        units.add(gameActionUnitRepository
+                .save(new GameActionUnit(action, trap1.getX(), trap1.getY(), team, UnitType.TRAP, false)));
+        units.add(gameActionUnitRepository
+                .save(new GameActionUnit(action, trap2.getX(), trap2.getY(), team, UnitType.TRAP, false)));
+        units.add(gameActionUnitRepository
+                .save(new GameActionUnit(action, flag.getX(), flag.getY(), team, UnitType.FLAG, false)));
+
+        action.setUnits(units);
+        final var gameState = gameStateService.processAction(action);
+        if (gameState.isRedSetSpecialUnits() && gameState.isBlueSetSpecialUnits()) {
             gameStateService.processAction(
                     gameActionRepository.save(new GameActionStart(gameId, lastAction.getActionId() + 2, Team.RED))
             );
         }
+        return action;
     }
 
     private void processActionMove(String gameId, Team team, GameAction lastAction, GameActionMoveRequestDTO request) {
@@ -201,9 +234,9 @@ public class GameService {
     public FightResult fight(UnitType redType, UnitType blueType) {
         if (redType == blueType) {
             return FightResult.TIE;
-        } else if (blueType == UnitType.FLAG) {
+        } else if (blueType == UnitType.FLAG || redType == UnitType.TRAP) {
             return FightResult.RED_WINS;
-        } else if (blueType == UnitType.TRAP) {
+        } else if (blueType == UnitType.TRAP || blueType== UnitType.FLAG) {
             return FightResult.BLUE_WINS;
         } else if ((redType == UnitType.ROCK && blueType == UnitType.SCISSORS)
                 || (redType == UnitType.SCISSORS && blueType == UnitType.PAPER)

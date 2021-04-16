@@ -32,6 +32,8 @@ export class GameStateModel {
             this.processActionShuffleUnits(action);
         } else if (action.actionType === 'ACCEPT_UNITS') {
             this.processActionAcceptUnits(action);
+        } else if (action.actionType === 'SET_SPECIAL_UNITS') {
+            this.processActionSetSpecialUnits(action);
         } else if (action.actionType === 'START') {
             this.processActionGameStart(action);
         } else if (action.actionType === 'MOVE') {
@@ -78,6 +80,18 @@ export class GameStateModel {
         if(team === this.playerTeam) {
             this.acceptedUnits = true;
         }
+    }
+
+    processActionSetSpecialUnits(setSpecialUnitsAction) {
+        const board = this.board;
+        setSpecialUnitsAction
+            .units
+            .forEach(unit => {
+                const team = Team[unit.team];
+                const type = UnitType[unit.type];
+                const visible = UnitType[unit.visible];
+                board[unit.location.y][unit.location.x] = new UnitModel({team, type, visible});
+            });
     }
 
     processActionGameStart(gameStartAction) {

@@ -32,6 +32,12 @@ public class GameState {
     @Column(name = "accepted_units_blue")
     private boolean blueAcceptedUnits;
 
+    @Column(name = "special_units_red")
+    private boolean redSetSpecialUnits;
+
+    @Column(name = "special_units_blue")
+    private boolean blueSetSpecialUnits;
+
     public GameState(String gameId) {
         this.id = gameId;
     }

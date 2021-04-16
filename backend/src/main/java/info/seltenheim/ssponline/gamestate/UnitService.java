@@ -88,6 +88,13 @@ public class UnitService {
         unitRepository.deleteByGameIdAndLocation(gameId, location);
     }
 
+    public void replaceUnitAtPosition(String gameId, GameActionUnit newUnit) {
+        deleteUnitAtLocation(gameId, newUnit.getLocation());
+
+        final var unit = new Unit(gameId, newUnit.getTeam(), newUnit.getType(), newUnit.getLocation(), newUnit.isVisible());
+        unitRepository.save(unit);
+    }
+
     public void moveUnit(String gameId, Point from, Point to) {
         unitRepository.updateUnitLocation(gameId, from, to);
     }
