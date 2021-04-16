@@ -23,17 +23,20 @@ public class GameController {
     private final UnitService unitService;
 
     @GetMapping("/game/{gameId}")
-    public GameDTO getGame(@PathVariable String gameId, @RequestParam("requestingPlayer") Team team) {
-        return toGameDTO(gameId, team);
+    public GameDTO getGame(@PathVariable String gameId,
+                           @RequestParam("requestingPlayer") Team team,
+                           @RequestParam(name = "fromIndex", defaultValue = "0") int fromIndex) {
+        return toGameDTO(gameId, team, fromIndex);
     }
 
     @PostMapping("/game/{gameId}/action")
     public GameDTO getGame(@PathVariable String gameId,
                            @RequestParam("requestingPlayer") Team team,
+                           @RequestParam(name = "fromIndex", defaultValue = "0") int fromIndex,
                            @RequestBody GameActionRequestDTO request) {
 
         gameService.processAction(gameId, team, request);
-        return toGameDTO(gameId, team);
+        return toGameDTO(gameId, team, fromIndex);
     }
 
 //    @PostMapping("/game/{gameId}/move")
@@ -55,9 +58,9 @@ public class GameController {
 //        return toGameDTO(gameId, team);
 //    }
 
-    private GameDTO toGameDTO(String gameId, Team requestingTeam) {
+    private GameDTO toGameDTO(String gameId, Team requestingTeam, int fromIndex) {
         final var game = gameService.getGame(gameId);
-        final var gameActions = gameService.getGameActions(gameId);
+        final var gameActions = gameService.getGameActions(gameId, fromIndex);
         gameActions.forEach(entityManager::refresh);
 
 

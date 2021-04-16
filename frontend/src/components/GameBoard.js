@@ -1,11 +1,11 @@
 import React from 'react';
 import {GameBoardField} from "./GameBoardField";
-import {GameState, Team, UnitType} from "../constants/Constants";
+import {GameState, Team} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
 import axios from "axios";
 import {AppConfig} from "../config";
 import {UnitSelector} from "./UnitSelector";
-import {GameStateModel} from "../model/GameState";
+import {GameStateModel} from "../model/GameStateModel";
 
 
 export class GameBoard extends React.Component {
@@ -32,7 +32,7 @@ export class GameBoard extends React.Component {
             url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
             params: {
                 requestingPlayer: this.team.api,
-                fromIndex: this.lastProcessedAction
+                fromIndex: this.state.gameState.lastProcessedAction + 1
             }
         }).then(this.processActions.bind(this))
     }
@@ -66,20 +66,6 @@ export class GameBoard extends React.Component {
         this.intervallId = null;
     }
 
-    handleBoardResponse(response) {
-        const activeTeam = Team[response.data.activeTeam];
-        this.setState({
-            board: this.generateBoard(response.data.units, response.data.fight),
-            activeTeam,
-            gameState: GameState[response.data.gameState],
-            fightLocation: response.data.fight ? response.data.fight.location : null,
-            fightChoice: response.data.fight ? UnitType[response.data.fight.choice] : null,
-            selectedField: null
-        });
-
-
-    }
-
     isAdjacentToSelectedField(otherField) {
         const selectedField = this.state.selectedField;
 
@@ -92,7 +78,8 @@ export class GameBoard extends React.Component {
             url: AppConfig.backendUrl + `/game/${this.props.gameId}/action`,
             data: {actionType: 'MOVE', from, to},
             params: {
-                requestingPlayer: this.team.api
+                requestingPlayer: this.team.api,
+                fromIndex: this.state.gameState.lastProcessedAction + 1
             }
         }).then(this.processActions.bind(this))
     }
@@ -130,7 +117,8 @@ export class GameBoard extends React.Component {
             url: AppConfig.backendUrl + `/game/${this.props.gameId}/action`,
             data: {actionType: 'FIGHT_CHOOSE_UNIT', unitType: unitType.api},
             params: {
-                requestingPlayer: this.team.api
+                requestingPlayer: this.team.api,
+                fromIndex: this.state.gameState.lastProcessedAction + 1
             }
         }).then(this.processActions.bind(this))
     }
@@ -160,7 +148,10 @@ export class GameBoard extends React.Component {
         }
 
         const unitSelector = gameState.gameState === GameState.FIGHT ?
-            <UnitSelector team={this.team} onChooseUnit={this.handleFightUnitChosen}/> : null;
+            <UnitSelector team={this.team}
+                          choice={gameState.fightChoice}
+                          onChooseUnit={this.handleFightUnitChosen}/> : null;
+
         const turnView = gameState.activeTeam != null ?
             <span className={gameState.activeTeam.color}>{gameState.activeTeam.name}</span> : null;
         return (

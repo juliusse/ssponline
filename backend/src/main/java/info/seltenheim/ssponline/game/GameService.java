@@ -1,5 +1,6 @@
 package info.seltenheim.ssponline.game;
 
+import info.seltenheim.ssponline.configuration.OffsetLimitPageable;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionFightChooseUnitRequestDTO;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionMoveRequestDTO;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
@@ -8,7 +9,6 @@ import info.seltenheim.ssponline.game.repository.GameActionRepository;
 import info.seltenheim.ssponline.game.repository.GameActionUnitRepository;
 import info.seltenheim.ssponline.game.repository.GameRepository;
 import info.seltenheim.ssponline.gamestate.GameStateService;
-import info.seltenheim.ssponline.gamestate.UnitService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,11 @@ public class GameService {
     }
 
     public List<GameAction> getGameActions(@NonNull String id) {
-        return gameActionRepository.findAllByGameIdOrderByActionIdAsc(id);
+        return gameActionRepository.findAllByGameIdOrderByActionIdAsc(id, new OffsetLimitPageable(0, 10000));
+    }
+
+    public List<GameAction> getGameActions(@NonNull String id, @NonNull int fromIndex) {
+        return gameActionRepository.findAllByGameIdOrderByActionIdAsc(id, new OffsetLimitPageable(fromIndex, 10000));
     }
 
 

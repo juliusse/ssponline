@@ -1,7 +1,7 @@
 import React from 'react';
-import {GameState} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
 import {Unit} from "./Unit";
+import {UnitType} from "../constants/Constants";
 
 export class GameBoardField extends React.Component {
     constructor(props) {
@@ -22,6 +22,15 @@ export class GameBoardField extends React.Component {
         return unit != null && unit.team === this.props.state.activeTeam;
     }
 
+    isFightLocation() {
+        const fightLocation = this.props.state.fightLocation;
+        if (fightLocation == null) {
+            return;
+        }
+
+        return fightLocation.x === this.props.x && fightLocation.y === this.props.y;
+    }
+
     classSelected() {
         const selectedField = this.props.state.selectedField;
         return selectedField != null && selectedField.x === this.props.x && selectedField.y === this.props.y ?
@@ -30,13 +39,16 @@ export class GameBoardField extends React.Component {
 
     render() {
         const unit = this.getUnit();
-        let content = <Unit
-            model={unit}
-        />;
+        let content = <Unit model={unit}/>;
+
+        if (this.isFightLocation()) {
+            content = <img alt={UnitType.FIGHT.name} src={UnitType.FIGHT.src()}/>
+        }
+
         if (!this.isMyTeamsTurn() && this.props.selectedField != null) {
             const selectedField = this.props.selectedField;
             const direction = isAdjacent(selectedField, this.props);
-            if(direction != null) {
+            if (direction != null) {
                 content = <img alt="direction" src={direction.src}/>
             }
         }

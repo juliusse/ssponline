@@ -95,7 +95,9 @@ export class GameStateModel {
             const winningUnit = fightAction.winningTeam === 'RED' ? fightAction.redType : fightAction.blueType;
             board[fightAction.location.y][fightAction.location.x] =
                 new UnitModel({team: winningTeam, type: UnitType[winningUnit], visible: true});
+            this.fightLocation = null;
         } else {
+            this.fightLocation = fightAction.location;
             board[fightAction.location.y][fightAction.location.x] =
                 new UnitModel({type: UnitType.FIGHT});
         }
