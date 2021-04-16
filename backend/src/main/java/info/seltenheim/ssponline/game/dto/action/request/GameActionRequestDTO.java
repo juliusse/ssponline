@@ -14,6 +14,7 @@ import lombok.Setter;
         property = "actionType")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = GameActionMoveRequestDTO.class, name = "MOVE"),
+        @JsonSubTypes.Type(value = GameActionFightChooseUnitRequestDTO.class, name = "FIGHT_CHOOSE_UNIT"),
 })
 public class GameActionRequestDTO {
     private GameActionType actionType;

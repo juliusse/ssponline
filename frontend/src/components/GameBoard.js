@@ -58,6 +58,8 @@ export class GameBoard extends React.Component {
             this.processActionMove(action);
         } else if (action.actionType === 'FIGHT') {
             this.processActionFight(action);
+        } else if (action.actionType === 'FIGHT_CHOOSE_UNIT') {
+            this.processActionFightChooseUnit(action);
         }
 
         this.setState({
@@ -131,7 +133,22 @@ export class GameBoard extends React.Component {
             board[fightAction.location.y][fightAction.location.x] = new UnitModel({type: UnitType.FIGHT});
         }
 
-        this.setState({board});
+        this.setState({
+            board,
+            fightChoice: null,
+        });
+    }
+
+    processActionFightChooseUnit(chooseAction) {
+        const team = Team[chooseAction.team];
+        if (team !== this.team) {
+            return;
+        }
+
+        const unitType = UnitType[chooseAction.type];
+        this.setState({
+            fightChoice: unitType
+        });
     }
 
     isMyTurn() {
@@ -163,12 +180,6 @@ export class GameBoard extends React.Component {
         });
 
 
-    }
-
-    generateBoard(units, fight) {
-        // if (fight) {
-        //     fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
-        // }
     }
 
     isAdjacentToSelectedField(otherField) {
@@ -221,12 +232,12 @@ export class GameBoard extends React.Component {
     handleFightUnitChosen(unitType) {
         axios({
             method: 'post',
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}/fight/choose`,
-            data: {unitType: unitType.api},
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}/action`,
+            data: {actionType: 'FIGHT_CHOOSE_UNIT', unitType: unitType.api},
             params: {
                 requestingPlayer: this.team.api
             }
-        }).then(this.handleBoardResponse.bind(this))
+        }).then(this.processActions.bind(this))
     }
 
     render() {

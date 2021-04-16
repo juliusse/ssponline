@@ -112,6 +112,14 @@ public class GameController {
                     .setWinningTeam(fightAction.getWinningTeam());
         }
 
+        if (gameAction instanceof GameActionFightChooseUnit) {
+            final var chooseAction = (GameActionFightChooseUnit) gameAction;
+
+            gameActionResponseDTO = new GameActionResponseFightChooseUnitDTO()
+                    .setTeam(chooseAction.getTeam())
+                    .setType(toUnitTypeDTO(chooseAction.getType(), chooseAction.getTeam(), requestingTeam, false));
+        }
+
         return gameActionResponseDTO
                 .setGameId(gameAction.getGameId())
                 .setActionId(gameAction.getActionId())
