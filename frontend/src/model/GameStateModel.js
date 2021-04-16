@@ -10,6 +10,7 @@ export class GameStateModel {
         this.activeTeam = null;
         this.gameState = null;
         this.board = null;
+        this.acceptedUnits = false;
         this.fightLocation = null;
         this.fightChoice = null;
     }
@@ -72,7 +73,11 @@ export class GameStateModel {
     }
 
     processActionAcceptUnits(acceptTurnAction) {
-        // todo
+        const team = Team[acceptTurnAction.team];
+
+        if(team === this.playerTeam) {
+            this.acceptedUnits = true;
+        }
     }
 
     processActionGameStart(gameStartAction) {

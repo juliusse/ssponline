@@ -17,6 +17,14 @@ export class GameBoardAdapter {
         });
     }
 
+    sendActionShuffleUnits({fromIndex}) {
+        return this.sendAction({ data: {actionType: 'SHUFFLE_UNITS' }, fromIndex});
+    }
+
+    sendActionAcceptUnits({fromIndex}) {
+        return this.sendAction({ data: {actionType: 'ACCEPT_UNITS' }, fromIndex});
+    }
+
     sendActionMoveUnit({from, to, fromIndex}) {
         return this.sendAction({ data: {actionType: 'MOVE', from, to}, fromIndex});
     }

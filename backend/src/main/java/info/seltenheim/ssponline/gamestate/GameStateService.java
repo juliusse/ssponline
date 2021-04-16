@@ -32,13 +32,15 @@ public class GameStateService {
             case SHUFFLE_UNITS:
                 gameState = processShuffleUnits((GameActionShuffleUnits) action);
                 break;
+            case ACCEPT_UNITS:
+                gameState = processAcceptUnits((GameActionAcceptUnits) action);
+                break;
             case MOVE:
                 gameState = processMove((GameActionMove) action);
                 break;
             case FIGHT:
                 gameState = processFight((GameActionFight) action);
                 break;
-            case ACCEPT_UNITS:
             case START:
             default:
                 gameState = gameRepository.findById(action.getGameId()).orElseThrow();
@@ -60,7 +62,19 @@ public class GameStateService {
         final var gameState = gameRepository.findById(action.getGameId()).orElseThrow();
         unitService.createUnitsForTeam(gameState.getId(), action.getTeam(), action.getUnits());
 
-        return gameRepository.findById(action.getGameId()).orElseThrow();
+        return gameState;
+    }
+
+    private GameState processAcceptUnits(GameActionAcceptUnits action) {
+        final var gameState = gameRepository.findById(action.getGameId()).orElseThrow();
+
+        if(action.getTeam() == Team.RED) {
+            gameState.setRedAcceptedUnits(true);
+        } else {
+            gameState.setBlueAcceptedUnits(true);
+        }
+
+        return gameState;
     }
 
     private GameState processMove(GameActionMove action) {

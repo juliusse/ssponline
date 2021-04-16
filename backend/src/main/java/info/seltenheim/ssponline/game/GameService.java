@@ -1,9 +1,7 @@
 package info.seltenheim.ssponline.game;
 
 import info.seltenheim.ssponline.configuration.OffsetLimitPageable;
-import info.seltenheim.ssponline.game.dto.action.request.GameActionFightChooseUnitRequestDTO;
-import info.seltenheim.ssponline.game.dto.action.request.GameActionMoveRequestDTO;
-import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
+import info.seltenheim.ssponline.game.dto.action.request.*;
 import info.seltenheim.ssponline.game.model.*;
 import info.seltenheim.ssponline.game.repository.GameActionRepository;
 import info.seltenheim.ssponline.game.repository.GameActionUnitRepository;
@@ -45,27 +43,36 @@ public class GameService {
 
 
         final var game = gameRepository.save(new Game(id));
-        gameStateService.processAction(
-                gameActionRepository.save(new GameActionConfigure(id, 0L))
-        );
+        final var actionConfigure = gameActionRepository.save(new GameActionConfigure(id, 0L));
+        gameStateService.processAction(actionConfigure);
 
-        createShuffleAction(id, 1L, Team.RED);
-        createShuffleAction(id, 2L, Team.BLUE);
-        gameStateService.processAction(
-                gameActionRepository.save(new GameActionAcceptUnits(id, 3L, Team.RED))
-        );
-        gameStateService.processAction(
-                gameActionRepository.save(new GameActionAcceptUnits(id, 4L, Team.BLUE))
-        );
-        gameStateService.processAction(
-                gameActionRepository.save(new GameActionStart(id, 5L, Team.RED))
-        );
+        final var redShuffle =
+                processShuffleUnitsAction(id, Team.RED, actionConfigure, new GameActionShuffleUnitsRequestDTO());
+        processShuffleUnitsAction(id, Team.BLUE, redShuffle, new GameActionShuffleUnitsRequestDTO());
 
         return game;
     }
 
-    private void createShuffleAction(String gameId, Long actionId, Team team) {
-        final var action = gameActionRepository.save(new GameActionShuffleUnits(gameId, actionId, team));
+    public void processAction(String gameId, Team team, GameActionRequestDTO request) {
+        final var lastAction = gameActionRepository.findFirstByGameIdOrderByActionIdDesc(gameId);
+
+        if (request instanceof GameActionShuffleUnitsRequestDTO) {
+            processShuffleUnitsAction(gameId, team, lastAction, (GameActionShuffleUnitsRequestDTO) request);
+        } else if (request instanceof GameActionAcceptUnitsRequestDTO) {
+            processAcceptUnitsAction(gameId, team, lastAction, (GameActionAcceptUnitsRequestDTO) request);
+        } else if (request instanceof GameActionMoveRequestDTO) {
+            processActionMove(gameId, team, lastAction, (GameActionMoveRequestDTO) request);
+        } else if (request instanceof GameActionFightChooseUnitRequestDTO) {
+            processActionFightChooseUnit(gameId, team, lastAction, (GameActionFightChooseUnitRequestDTO) request);
+        }
+    }
+
+    private GameActionShuffleUnits processShuffleUnitsAction(String gameId,
+                                                             Team team,
+                                                             GameAction lastAction,
+                                                             GameActionShuffleUnitsRequestDTO request) {
+
+        final var action = gameActionRepository.save(new GameActionShuffleUnits(gameId, lastAction.getActionId() + 1, team));
 
         final var allowedFigures = new UnitType[]{UnitType.ROCK, UnitType.PAPER, UnitType.SCISSORS};
 
@@ -83,18 +90,23 @@ public class GameService {
 
         action.setUnits(units);
         gameStateService.processAction(action);
+
+        return action;
     }
 
-    public void processAction(String gameId, Team team, GameActionRequestDTO request) {
-        if (request instanceof GameActionMoveRequestDTO) {
-            processActionMove(gameId, team, (GameActionMoveRequestDTO) request);
-        } else if (request instanceof GameActionFightChooseUnitRequestDTO) {
-            processActionFightChooseUnit(gameId, team, (GameActionFightChooseUnitRequestDTO) request);
+    private void processAcceptUnitsAction(String gameId, Team team, GameAction lastAction, GameActionAcceptUnitsRequestDTO request) {
+        final var gameState = gameStateService.processAction(
+                gameActionRepository.save(new GameActionAcceptUnits(gameId, lastAction.getActionId() + 1, team))
+        );
+
+        if(gameState.isRedAcceptedUnits() && gameState.isBlueAcceptedUnits()) {
+            gameStateService.processAction(
+                    gameActionRepository.save(new GameActionStart(gameId, lastAction.getActionId() + 2, Team.RED))
+            );
         }
     }
 
-    private void processActionMove(String gameId, Team team, GameActionMoveRequestDTO request) {
-        final var lastAction = gameActionRepository.findFirstByGameIdOrderByActionIdDesc(gameId);
+    private void processActionMove(String gameId, Team team, GameAction lastAction, GameActionMoveRequestDTO request) {
         if (lastAction.getActiveTeam() != team) {
             throw new IllegalStateException();
         }
@@ -125,10 +137,7 @@ public class GameService {
         }
     }
 
-    private void processActionFightChooseUnit(String gameId, Team team, GameActionFightChooseUnitRequestDTO request) {
-        final var game = gameRepository.findById(gameId).orElseThrow();
-        final var lastAction = gameActionRepository.findFirstByGameIdOrderByActionIdDesc(gameId);
-
+    private void processActionFightChooseUnit(String gameId, Team team, GameAction lastAction, GameActionFightChooseUnitRequestDTO request) {
         if (lastAction instanceof GameActionFightChooseUnit && ((GameActionFightChooseUnit) lastAction).getTeam() == team) {
             return;
         }

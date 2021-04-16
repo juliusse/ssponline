@@ -5,6 +5,7 @@ import {isAdjacent} from "../utils/Utils";
 import {UnitSelector} from "./UnitSelector";
 import {GameStateModel} from "../model/GameStateModel";
 import {GameBoardAdapter} from "../utils/GameBoardAdapter";
+import {GameStartOptions} from "./GameStartOptions";
 
 
 export class GameBoard extends React.Component {
@@ -17,6 +18,8 @@ export class GameBoard extends React.Component {
         };
         this.handleFieldClick = this.handleFieldClick.bind(this);
         this.handleFightUnitChosen = this.handleFightUnitChosen.bind(this);
+        this.handleShuffleClick = this.handleShuffleClick.bind(this);
+        this.handleAcceptClick = this.handleAcceptClick.bind(this);
     }
 
     componentDidMount() {
@@ -45,11 +48,24 @@ export class GameBoard extends React.Component {
             .then(this.processActions.bind(this))
     }
 
+    handleShuffleClick() {
+        this.gameBoardAdapter
+            .sendActionShuffleUnits({fromIndex: this.state.gameState.lastProcessedAction + 1})
+            .then(this.processActions.bind(this));
+    }
+
+    handleAcceptClick() {
+        this.gameBoardAdapter
+            .sendActionAcceptUnits({fromIndex: this.state.gameState.lastProcessedAction + 1})
+            .then(this.processActions.bind(this));
+    }
+
     processActions(response) {
         const gameState = this.state.gameState.processActions({actions: response.data.gameActions});
         this.setState({gameState});
 
-        if ((gameState.gameState !== GameState.FIGHT && gameState.activeTeam !== this.team) ||
+        if ((gameState.gameState === GameState.SETUP && gameState.acceptedUnits) ||
+            (gameState.gameState === GameState.TURN && gameState.activeTeam !== this.team) ||
             (gameState.gameState === GameState.FIGHT && gameState.fightChoice != null)) {
             this.startCheck();
         } else {
@@ -107,7 +123,6 @@ export class GameBoard extends React.Component {
         })
     }
 
-
     render() {
         const gameState = this.state.gameState;
         if (gameState.board == null) {
@@ -139,9 +154,12 @@ export class GameBoard extends React.Component {
 
         const turnView = gameState.activeTeam != null ?
             <span className={gameState.activeTeam.color}>{gameState.activeTeam.name}</span> : null;
+
+        const setupView = gameState.gameState === GameState.SETUP && !gameState.acceptedUnits ?
+            <GameStartOptions onShuffleClick={this.handleShuffleClick} onAcceptClick={this.handleAcceptClick}/> : null;
         return (
             <div className="container">
-                <div className="state">GameBoard | Turn: {turnView}
+                <div className="state">GameBoard | Turn: {turnView} | {setupView}
                 </div>
                 <div className="gameboard">
                     {fields}
