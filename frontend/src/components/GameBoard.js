@@ -2,16 +2,16 @@ import React from 'react';
 import {GameBoardField} from "./GameBoardField";
 import {GameState, Team} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
-import axios from "axios";
-import {AppConfig} from "../config";
 import {UnitSelector} from "./UnitSelector";
 import {GameStateModel} from "../model/GameStateModel";
+import {GameBoardAdapter} from "../utils/GameBoardAdapter";
 
 
 export class GameBoard extends React.Component {
     constructor(props) {
         super(props);
         this.team = Team[props.team];
+        this.gameBoardAdapter = new GameBoardAdapter({gameId: props.gameId, requestingTeam: this.team});
         this.state = {
             gameState: new GameStateModel({playerTeam: Team[props.team]})
         };
@@ -28,13 +28,21 @@ export class GameBoard extends React.Component {
     }
 
     loadActions() {
-        axios({
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}`,
-            params: {
-                requestingPlayer: this.team.api,
-                fromIndex: this.state.gameState.lastProcessedAction + 1
-            }
-        }).then(this.processActions.bind(this))
+        this.gameBoardAdapter
+            .getActionsAsync({fromIndex: this.state.gameState.lastProcessedAction + 1})
+            .then(this.processActions.bind(this));
+    }
+
+    moveUnit(from, to) {
+        this.gameBoardAdapter
+            .sendActionMoveUnit({from, to, fromIndex: this.state.gameState.lastProcessedAction + 1})
+            .then(this.processActions.bind(this));
+    }
+
+    handleFightUnitChosen(unitType) {
+        this.gameBoardAdapter
+            .sendActionFightUnitChosen({unitType, fromIndex: this.state.gameState.lastProcessedAction + 1})
+            .then(this.processActions.bind(this))
     }
 
     processActions(response) {
@@ -72,18 +80,6 @@ export class GameBoard extends React.Component {
         return selectedField != null && isAdjacent(selectedField, otherField) != null;
     }
 
-    moveUnit(from, to) {
-        axios({
-            method: 'post',
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}/action`,
-            data: {actionType: 'MOVE', from, to},
-            params: {
-                requestingPlayer: this.team.api,
-                fromIndex: this.state.gameState.lastProcessedAction + 1
-            }
-        }).then(this.processActions.bind(this))
-    }
-
     handleFieldClick({x, y}) {
         const gameState = this.state.gameState;
         const unit = gameState.board[y][x];
@@ -111,17 +107,6 @@ export class GameBoard extends React.Component {
         })
     }
 
-    handleFightUnitChosen(unitType) {
-        axios({
-            method: 'post',
-            url: AppConfig.backendUrl + `/game/${this.props.gameId}/action`,
-            data: {actionType: 'FIGHT_CHOOSE_UNIT', unitType: unitType.api},
-            params: {
-                requestingPlayer: this.team.api,
-                fromIndex: this.state.gameState.lastProcessedAction + 1
-            }
-        }).then(this.processActions.bind(this))
-    }
 
     render() {
         const gameState = this.state.gameState;

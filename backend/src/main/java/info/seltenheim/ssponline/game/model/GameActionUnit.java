@@ -15,7 +15,7 @@ public class GameActionUnit {
 
     @Id
     @ManyToOne
-    @JoinColumn(name="game_action_id", nullable=false)
+    @JoinColumn(name = "game_action_id", nullable = false)
     private GameAction gameActionId;
 
     @Id

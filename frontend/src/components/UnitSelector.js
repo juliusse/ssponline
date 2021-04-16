@@ -19,13 +19,13 @@ export class UnitSelector extends React.Component {
             <div className="unitSelector">
                 <Unit isActive={this.props.choice === UnitType.ROCK}
                       onClick={this.handleClick}
-                      model={new UnitModel({team: this.props.team, type: UnitType.ROCK})} />
+                      model={new UnitModel({team: this.props.team, type: UnitType.ROCK})}/>
                 <Unit isActive={this.props.choice === UnitType.PAPER}
                       onClick={this.handleClick}
-                      model={new UnitModel({team: this.props.team, type: UnitType.PAPER})} />
+                      model={new UnitModel({team: this.props.team, type: UnitType.PAPER})}/>
                 <Unit isActive={this.props.choice === UnitType.SCISSORS}
                       onClick={this.handleClick}
-                      model={new UnitModel({team: this.props.team, type: UnitType.SCISSORS})} />
+                      model={new UnitModel({team: this.props.team, type: UnitType.SCISSORS})}/>
             </div>
         );
     }

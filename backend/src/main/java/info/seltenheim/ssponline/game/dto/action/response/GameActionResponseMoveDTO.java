@@ -1,7 +1,6 @@
 package info.seltenheim.ssponline.game.dto.action.response;
 
 import info.seltenheim.ssponline.game.model.Point;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

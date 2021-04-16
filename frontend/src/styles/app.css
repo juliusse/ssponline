@@ -7,6 +7,7 @@
     width: 600px;
     margin: 12px auto;
 }
+
 .gameboard {
     display: flex;
     flex-direction: column;
@@ -26,11 +27,11 @@
     border: solid 1px black;
 }
 
-.gameboard_field div{
+.gameboard_field div {
     margin: auto auto;
 }
 
-.gameboard_field.selected{
+.gameboard_field.selected {
     border: solid 1px red;
     background-color: lightgray;
 }

@@ -1,7 +1,10 @@
 package info.seltenheim.ssponline.game.dto.action.response;
 
 import info.seltenheim.ssponline.game.model.Team;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
