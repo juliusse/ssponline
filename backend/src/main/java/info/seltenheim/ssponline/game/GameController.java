@@ -15,7 +15,7 @@ import static info.seltenheim.ssponline.game.dto.action.response.GameActionRespo
 
 @RestController
 @RequiredArgsConstructor
-@Transactional(isolation = Isolation.READ_COMMITTED)
+//@Transactional(isolation = Isolation.READ_COMMITTED)
 public class GameController {
     private final EntityManager entityManager;
     private final GameService gameService;
@@ -40,7 +40,6 @@ public class GameController {
     private GameDTO toGameDTO(String gameId, Team requestingTeam, int fromIndex) {
         final var game = gameService.getGame(gameId);
         final var gameActions = gameService.getGameActions(gameId, fromIndex);
-        gameActions.forEach(entityManager::refresh);
 
         final var gameActionDTOs =
                 gameActions
