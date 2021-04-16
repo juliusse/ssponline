@@ -33,8 +33,8 @@ export class GameBoardField extends React.Component {
         let content = <Unit
             model={unit}
         />;
-        if (!this.isMyTeamsTurn() && this.props.state.gameState === GameState.MOVE_UNIT) {
-            const selectedField = this.props.state.selectedField;
+        if (!this.isMyTeamsTurn() && this.props.selectedField != null) {
+            const selectedField = this.props.selectedField;
             const direction = isAdjacent(selectedField, this.props);
             if(direction != null) {
                 content = <img alt="direction" src={direction.src}/>

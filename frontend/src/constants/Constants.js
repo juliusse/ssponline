@@ -16,7 +16,6 @@ export const Team = {
 export const GameState = {
     CONFIGURE: 'CONFIGURE',
     TURN: 'TURN',
-    MOVE_UNIT: 'MOVE_UNIT',
     FIGHT: 'FIGHT',
 }
 

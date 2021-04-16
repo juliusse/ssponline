@@ -2,19 +2,19 @@ import React from 'react';
 import {GameBoardField} from "./GameBoardField";
 import {GameState, Team, UnitType} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
-import {UnitModel} from "../model/UnitModel";
 import axios from "axios";
 import {AppConfig} from "../config";
 import {UnitSelector} from "./UnitSelector";
+import {GameStateModel} from "../model/GameState";
 
 
 export class GameBoard extends React.Component {
     constructor(props) {
         super(props);
         this.team = Team[props.team];
-        this.actions = [];
-        this.lastProcessedAction = -1;
-        this.state = {};
+        this.state = {
+            gameState: new GameStateModel({playerTeam: Team[props.team]})
+        };
         this.handleFieldClick = this.handleFieldClick.bind(this);
         this.handleFightUnitChosen = this.handleFightUnitChosen.bind(this);
     }
@@ -38,121 +38,19 @@ export class GameBoard extends React.Component {
     }
 
     processActions(response) {
-        response.data.gameActions.forEach(action => {
-            if (action.actionId > this.lastProcessedAction) {
-                this.processAction(action);
-            }
-        });
-    }
+        const gameState = this.state.gameState.processActions({actions: response.data.gameActions});
+        this.setState({gameState});
 
-    processAction(action) {
-        if (action.actionType === 'CONFIGURE') {
-            this.processActionConfigure(action);
-        } else if (action.actionType === 'SHUFFLE_UNITS') {
-            this.processActionShuffleUnits(action);
-        } else if (action.actionType === 'ACCEPT_UNITS') {
-            this.processActionAcceptTurn(action);
-        } else if (action.actionType === 'START') {
-            this.processActionGameStart(action);
-        } else if (action.actionType === 'MOVE') {
-            this.processActionMove(action);
-        } else if (action.actionType === 'FIGHT') {
-            this.processActionFight(action);
-        } else if (action.actionType === 'FIGHT_CHOOSE_UNIT') {
-            this.processActionFightChooseUnit(action);
-        }
-
-        this.setState({
-            activeTeam: Team[action.activeTeam],
-            gameState: GameState[action.gameState]
-        })
-        this.lastProcessedAction = action.actionId;
-
-        if ((this.state.gameState !== GameState.FIGHT && this.state.activeTeam !== this.team) ||
-            (this.state.gameState === GameState.FIGHT && this.state.fightChoice != null)) {
+        if ((gameState.gameState !== GameState.FIGHT && gameState.activeTeam !== this.team) ||
+            (gameState.gameState === GameState.FIGHT && gameState.fightChoice != null)) {
             this.startCheck();
         } else {
             this.stopCheck();
         }
     }
 
-    processActionConfigure(configureAction) {
-        const board = [];
-        board.push([null, null, null, null, null, null, null]);
-        board.push([null, null, null, null, null, null, null]);
-        board.push([null, null, null, null, null, null, null]);
-        board.push([null, null, null, null, null, null, null]);
-        board.push([null, null, null, null, null, null, null]);
-        board.push([null, null, null, null, null, null, null]);
-
-        this.setState({board})
-    }
-
-    processActionShuffleUnits(shuffleUnitsAction) {
-        const board = this.state.board;
-        shuffleUnitsAction
-            .units
-            .forEach(unit => {
-                const team = Team[unit.team];
-                const type = UnitType[unit.type];
-                const visible = UnitType[unit.visible];
-                const model = new UnitModel({team, type, visible})
-                board[unit.location.y][unit.location.x] = model;
-            });
-
-        this.setState({board})
-    }
-
-    processActionAcceptTurn(acceptTurnAction) {
-        // todo
-    }
-
-    processActionGameStart(gameStartAction) {
-        // todo
-    }
-
-    processActionMove(moveAction) {
-        const board = this.state.board;
-        const unit = board[moveAction.from.y][moveAction.from.x];
-
-        board[moveAction.from.y][moveAction.from.x] = null;
-        board[moveAction.to.y][moveAction.to.x] = unit;
-
-        this.setState({board});
-    }
-
-    processActionFight(fightAction) {
-        const board = this.state.board;
-
-        if (fightAction.winningTeam != null) {
-            const winningTeam = Team[fightAction.winningTeam];
-            const winningUnit = fightAction.winningTeam === 'RED' ? fightAction.redType : fightAction.blueType;
-            const model = new UnitModel({team: winningTeam, type: UnitType[winningUnit], visible: true})
-            board[fightAction.location.y][fightAction.location.x] = model;
-        } else {
-            board[fightAction.location.y][fightAction.location.x] = new UnitModel({type: UnitType.FIGHT});
-        }
-
-        this.setState({
-            board,
-            fightChoice: null,
-        });
-    }
-
-    processActionFightChooseUnit(chooseAction) {
-        const team = Team[chooseAction.team];
-        if (team !== this.team) {
-            return;
-        }
-
-        const unitType = UnitType[chooseAction.type];
-        this.setState({
-            fightChoice: unitType
-        });
-    }
-
     isMyTurn() {
-        return this.state.requestingPlayer === this.state.activeTeam;
+        return this.team === this.state.gameState.activeTeam;
     }
 
     startCheck() {
@@ -200,23 +98,21 @@ export class GameBoard extends React.Component {
     }
 
     handleFieldClick({x, y}) {
-        const unit = this.state.board[y][x];
+        const gameState = this.state.gameState;
+        const unit = gameState.board[y][x];
 
         // clicking on own unit
-        if (unit !== null && unit.team === this.team && this.team === this.state.activeTeam) {
-            switch (this.state.gameState) {
-                case "TURN":
-                case "MOVE_UNIT":
-                    this.setState({
-                        selectedField: {x, y},
-                        gameState: GameState.MOVE_UNIT
-                    })
-                    break;
-                default:
-            }
+        if (unit !== null &&
+            unit.team === this.team &&
+            this.team === gameState.activeTeam &&
+            gameState.gameState === GameState.TURN) {
 
+            this.setState({
+                selectedField: {x, y},
+            });
             return;
         }
+
         // clicking on neigbouring field
         if (this.isAdjacentToSelectedField({x, y})) {
             this.moveUnit(this.state.selectedField, {x, y});
@@ -224,8 +120,7 @@ export class GameBoard extends React.Component {
 
         // clicking on invalid field
         this.setState({
-            selectedField: null,
-            gameState: GameState.TURN
+            selectedField: null
         })
     }
 
@@ -241,7 +136,8 @@ export class GameBoard extends React.Component {
     }
 
     render() {
-        if (this.state.board == null) {
+        const gameState = this.state.gameState;
+        if (gameState.board == null) {
             return <div></div>;
         }
         const fields = [];
@@ -250,7 +146,8 @@ export class GameBoard extends React.Component {
             for (let x = 0; x < 7; x++) {
                 const color = (x + y) % 2 === 0 ? "green" : "white";
                 row.push(<GameBoardField
-                    state={this.state}
+                    state={gameState}
+                    selectedField={this.state.selectedField}
                     key={`field_${x}_${y}`}
                     x={x}
                     y={y}
@@ -262,10 +159,10 @@ export class GameBoard extends React.Component {
             fields.push(<div key={`row_${y}`} className="gameboard_row">{row}</div>);
         }
 
-        const unitSelector = this.state.gameState === GameState.FIGHT ?
+        const unitSelector = gameState.gameState === GameState.FIGHT ?
             <UnitSelector team={this.team} onChooseUnit={this.handleFightUnitChosen}/> : null;
-        const turnView = this.state.activeTeam != null ?
-            <span className={this.state.activeTeam.color}>{this.state.activeTeam.name}</span> : null;
+        const turnView = gameState.activeTeam != null ?
+            <span className={gameState.activeTeam.color}>{gameState.activeTeam.name}</span> : null;
         return (
             <div className="container">
                 <div className="state">GameBoard | Turn: {turnView}
