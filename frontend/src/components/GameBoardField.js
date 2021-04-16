@@ -1,11 +1,12 @@
 import React from 'react';
-import {isAdjacent} from "../utils/Utils";
+import {isAdjacent, pointEqual} from "../utils/Utils";
 import {Unit} from "./Unit";
-import {UnitType} from "../constants/Constants";
+import {GameState, UnitType} from "../constants/Constants";
 
 export class GameBoardField extends React.Component {
     constructor(props) {
         super(props);
+        this.location = {x: props.x, y: props.y};
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -41,6 +42,16 @@ export class GameBoardField extends React.Component {
         const unit = this.getUnit();
         let content = <Unit model={unit}/>;
 
+        if (this.props.state.gameState === GameState.SETUP) {
+            if (pointEqual(this.location, this.props.setUpUnits.trap1) ||
+                pointEqual(this.location, this.props.setUpUnits.trap2)) {
+                content = <img alt={UnitType.TRAP.name} src={UnitType.TRAP.src(this.props.state.playerTeam.imgColor)}/>
+            }
+            if (pointEqual(this.location, this.props.setUpUnits.flag)) {
+                content = <img alt={UnitType.TRAP.name} src={UnitType.FLAG.src(this.props.state.playerTeam.imgColor)}/>
+            }
+        }
+
         if (this.isFightLocation()) {
             content = <img alt={UnitType.FIGHT.name} src={UnitType.FIGHT.src()}/>
         }
@@ -59,12 +70,4 @@ export class GameBoardField extends React.Component {
             </div>
         )
     }
-}
-
-GameBoardField.defaultProps = {
-    state: null,
-    x: null,
-    y: null,
-    color: null,
-    onClick: null,
 }

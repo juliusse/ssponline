@@ -100,19 +100,19 @@ public class GameService {
         final var action = gameActionRepository.save(new GameActionAcceptUnits(gameId, lastAction.getActionId() + 1, team));
         final var gameState = gameStateService.processAction(action);
 
-        if (gameState.isRedAcceptedUnits() && gameState.isBlueAcceptedUnits()) {
-            final var redAcceptAction =
-                    processActionSetSpecialUnits(gameId, Team.RED, action, new GameActionSetSpecialUnitsRequestDTO()
-                            .setFlag(new Point(3, 0))
-                            .setTrap1(new Point(2, 1))
-                            .setTrap2(new Point(5, 1)));
-            processActionSetSpecialUnits(gameId, Team.BLUE, redAcceptAction, new GameActionSetSpecialUnitsRequestDTO()
-                    .setFlag(new Point(3, 5))
-                    .setTrap1(new Point(2, 4))
-                    .setTrap2(new Point(5, 4)));
-
-
-        }
+//        if (gameState.isRedAcceptedUnits() && gameState.isBlueAcceptedUnits()) {
+//            final var redAcceptAction =
+//                    processActionSetSpecialUnits(gameId, Team.RED, action, new GameActionSetSpecialUnitsRequestDTO()
+//                            .setFlag(new Point(3, 0))
+//                            .setTrap1(new Point(2, 1))
+//                            .setTrap2(new Point(5, 1)));
+//            processActionSetSpecialUnits(gameId, Team.BLUE, redAcceptAction, new GameActionSetSpecialUnitsRequestDTO()
+//                    .setFlag(new Point(3, 5))
+//                    .setTrap1(new Point(2, 4))
+//                    .setTrap2(new Point(5, 4)));
+//
+//
+//        }
     }
 
     private GameActionSetSpecialUnits processActionSetSpecialUnits(String gameId, Team team, GameAction lastAction, GameActionSetSpecialUnitsRequestDTO request) {

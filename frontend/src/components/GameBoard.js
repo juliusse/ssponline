@@ -1,11 +1,12 @@
 import React from 'react';
 import {GameBoardField} from "./GameBoardField";
-import {GameState, Team} from "../constants/Constants";
+import {GameState, Team, UnitType} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
 import {UnitSelector} from "./UnitSelector";
 import {GameStateModel} from "../model/GameStateModel";
 import {GameBoardAdapter} from "../utils/GameBoardAdapter";
 import {GameStartOptions} from "./GameStartOptions";
+import {GameStartUnitSelect} from "./GameStartUnitSelect";
 
 
 export class GameBoard extends React.Component {
@@ -14,12 +15,20 @@ export class GameBoard extends React.Component {
         this.team = Team[props.team];
         this.gameBoardAdapter = new GameBoardAdapter({gameId: props.gameId, requestingTeam: this.team});
         this.state = {
-            gameState: new GameStateModel({playerTeam: Team[props.team]})
+            gameState: new GameStateModel({playerTeam: Team[props.team]}),
+            selectedUnit: null,
+            setUpUnits: {
+                trap1: null,
+                trap2: null,
+                flag: null
+            }
         };
         this.handleFieldClick = this.handleFieldClick.bind(this);
         this.handleFightUnitChosen = this.handleFightUnitChosen.bind(this);
         this.handleShuffleClick = this.handleShuffleClick.bind(this);
         this.handleAcceptClick = this.handleAcceptClick.bind(this);
+        this.handleRestUnitsClick = this.handleRestUnitsClick.bind(this);
+        this.handleAcceptSpecialUnitsClick = this.handleAcceptSpecialUnitsClick.bind(this);
     }
 
     componentDidMount() {
@@ -60,6 +69,27 @@ export class GameBoard extends React.Component {
             .then(this.processActions.bind(this));
     }
 
+    handleRestUnitsClick() {
+        this.setState({
+            setUpUnits: {
+                trap1: null,
+                trap2: null,
+                flag: null
+            }
+        });
+    }
+
+    handleAcceptSpecialUnitsClick() {
+        this.gameBoardAdapter
+            .sendActionSelectSpecialUnits({
+                trap1: this.state.setUpUnits.trap1,
+                trap2: this.state.setUpUnits.trap2,
+                flag: this.state.setUpUnits.flag,
+                fromIndex: this.state.gameState.lastProcessedAction + 1
+            })
+            .then(this.processActions.bind(this));
+    }
+
     processActions(response) {
         const gameState = this.state.gameState.processActions({actions: response.data.gameActions});
         this.setState({gameState});
@@ -96,16 +126,49 @@ export class GameBoard extends React.Component {
         return selectedField != null && isAdjacent(selectedField, otherField) != null;
     }
 
-    handleFieldClick({x, y}) {
+    handleFieldClick(location) {
+        const gameState = this.state.gameState;
+
+        if (gameState.gameState === GameState.SETUP) {
+            this.handleFieldClickStateSetup(location);
+            return;
+        }
+
+        if (gameState.gameState === GameState.TURN) {
+            this.handleFieldClickStateTurn(location);
+            return;
+        }
+    }
+
+    handleFieldClickStateSetup({x, y}) {
+        const gameState = this.state.gameState;
+        const setUpUnits = this.state.setUpUnits;
+        const unit = gameState.board[y][x];
+
+        if (!gameState.acceptedUnits || gameState.acceptedSpecialUnits) {
+            return;
+        }
+        if (unit.team === this.team && unit.type !== UnitType.FLAG) {
+            if (setUpUnits.trap1 == null) {
+                setUpUnits.trap1 = {x, y};
+            } else if (setUpUnits.trap2 == null) {
+                setUpUnits.trap2 = {x, y};
+            } else {
+                setUpUnits.flag = {x, y};
+            }
+        }
+
+        this.setState({setUpUnits});
+    }
+
+    handleFieldClickStateTurn({x, y}) {
         const gameState = this.state.gameState;
         const unit = gameState.board[y][x];
 
-        // clicking on own unit
         if (unit !== null &&
             unit.type.isMovable &&
             unit.team === this.team &&
-            this.team === gameState.activeTeam &&
-            gameState.gameState === GameState.TURN) {
+            this.team === gameState.activeTeam) {
 
             this.setState({
                 selectedField: {x, y},
@@ -136,6 +199,7 @@ export class GameBoard extends React.Component {
                 const color = (x + y) % 2 === 0 ? "green" : "white";
                 row.push(<GameBoardField
                     state={gameState}
+                    setUpUnits={this.state.setUpUnits}
                     selectedField={this.state.selectedField}
                     key={`field_${x}_${y}`}
                     x={x}
@@ -158,9 +222,20 @@ export class GameBoard extends React.Component {
 
         const setupView = gameState.gameState === GameState.SETUP && !gameState.acceptedUnits ?
             <GameStartOptions onShuffleClick={this.handleShuffleClick} onAcceptClick={this.handleAcceptClick}/> : null;
+
+        const setUpUnits = this.state.setUpUnits;
+        const specialUnitsSet = setUpUnits.trap1 && setUpUnits.trap2 && setUpUnits.flag;
+        const acceptUnitsView =
+            gameState.acceptedUnits &&
+            !gameState.acceptedSpecialUnits &&
+            gameState.gameState === GameState.SETUP &&
+            specialUnitsSet ?
+                <GameStartUnitSelect onResetClick={this.handleRestUnitsClick}
+                                     onAcceptClick={this.handleAcceptSpecialUnitsClick}/> :
+                null;
         return (
             <div className="container">
-                <div className="state">GameBoard | Turn: {turnView} | {setupView}
+                <div className="state">GameBoard | Turn: {turnView} | {setupView} {acceptUnitsView}
                 </div>
                 <div className="gameboard">
                     {fields}

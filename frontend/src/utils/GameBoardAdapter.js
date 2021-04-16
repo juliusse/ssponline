@@ -25,6 +25,15 @@ export class GameBoardAdapter {
         return this.sendAction({ data: {actionType: 'ACCEPT_UNITS' }, fromIndex});
     }
 
+    sendActionSelectSpecialUnits({trap1, trap2, flag, fromIndex}) {
+        return this.sendAction({
+            data: {
+                actionType: 'SET_SPECIAL_UNITS',
+                trap1, trap2, flag
+            },
+            fromIndex});
+    }
+
     sendActionMoveUnit({from, to, fromIndex}) {
         return this.sendAction({ data: {actionType: 'MOVE', from, to}, fromIndex});
     }

@@ -11,6 +11,7 @@ export class GameStateModel {
         this.gameState = null;
         this.board = null;
         this.acceptedUnits = false;
+        this.acceptedSpecialUnits = false;
         this.fightLocation = null;
         this.fightChoice = null;
     }
@@ -92,6 +93,10 @@ export class GameStateModel {
                 const visible = UnitType[unit.visible];
                 board[unit.location.y][unit.location.x] = new UnitModel({team, type, visible});
             });
+
+        if(Team[setSpecialUnitsAction.team] === this.playerTeam) {
+            this.acceptedSpecialUnits = true;
+        }
     }
 
     processActionGameStart(gameStartAction) {

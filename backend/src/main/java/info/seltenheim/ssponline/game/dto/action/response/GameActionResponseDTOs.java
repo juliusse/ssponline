@@ -40,6 +40,7 @@ public class GameActionResponseDTOs {
                     .collect(Collectors.toList());
 
             gameActionResponseDTO = new GameActionSetSpecialUnitsResponseDTO()
+                    .setTeam(((GameActionSetSpecialUnits) gameAction).getTeam())
                     .setUnits(unitDTOs);
         }
 
