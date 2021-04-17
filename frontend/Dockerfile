@@ -1,7 +1,9 @@
 FROM node:14.15.5-alpine
+ARG APP_URL
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
+ENV REACT_APP_URL $APP_URL
 
 # install app dependencies
 COPY package.json ./
