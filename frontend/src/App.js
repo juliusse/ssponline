@@ -1,5 +1,5 @@
 import React from 'react';
-import {GameBoard} from "./components/GameBoard";
+import {GameBoard} from './components/GameBoard';
 import './styles/app.css'
 
 class App extends React.Component {
@@ -15,10 +15,10 @@ class App extends React.Component {
     }
 
     render() {
-        const devMode = this.getQueryVariable("dev") || false;
-        const gameId = this.getQueryVariable("gameId");
-        const team = this.getQueryVariable("team");
-        const otherTeam = this.getQueryVariable("team") === "RED" ? "BLUE" : "RED";
+        const devMode = this.getQueryVariable('dev') || false;
+        const gameId = this.getQueryVariable('gameId') || 'dev';
+        const team = this.getQueryVariable('team') || 'RED';
+        const otherTeam = team === 'RED' ? 'BLUE' : 'RED';
 
         const devBoard = devMode ? <GameBoard team={otherTeam} gameId={gameId}/> : null;
         return (

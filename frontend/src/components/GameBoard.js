@@ -5,6 +5,7 @@ import {isAdjacent} from "../utils/Utils";
 import {UnitModel} from "../model/UnitModel";
 import axios from "axios";
 import {AppConfig} from "../config";
+import {UnitSelector} from "./UnitSelector";
 
 
 export class GameBoard extends React.Component {
@@ -13,6 +14,7 @@ export class GameBoard extends React.Component {
         this.team = Team[props.team];
         this.state = {};
         this.handleFieldClick = this.handleFieldClick.bind(this);
+        this.handleFightUnitChosen = this.handleFightUnitChosen.bind(this);
     }
 
     componentDidMount() {
@@ -27,7 +29,7 @@ export class GameBoard extends React.Component {
         if (this.intervallId == null) {
             this.intervallId = setInterval(() => {
                 this.reloadBoard();
-            }, 1000);
+            }, 2000);
         }
     }
 
@@ -39,13 +41,16 @@ export class GameBoard extends React.Component {
     handleBoardResponse(response) {
         const activeTeam = Team[response.data.activeTeam];
         this.setState({
-            board: this.generateBoard(response.data.units),
+            board: this.generateBoard(response.data.units, response.data.fight),
             activeTeam,
             gameState: GameState[response.data.gameState],
+            fightLocation: response.data.fight ? response.data.fight.location : null,
+            fightChoice: response.data.fight ? UnitType[response.data.fight.choice] : null,
             selectedField: null
         });
 
-        if (activeTeam !== this.team) {
+        if ((this.state.gameState !== GameState.FIGHT && activeTeam !== this.team) ||
+            (this.state.gameState === GameState.FIGHT && this.state.fightChoice != null)) {
             this.startCheck();
         } else {
             this.stopCheck();
@@ -61,7 +66,7 @@ export class GameBoard extends React.Component {
         }).then(this.handleBoardResponse.bind(this))
     }
 
-    generateBoard(units) {
+    generateBoard(units, fight) {
         const fields = [];
         fields.push([null, null, null, null, null, null, null]);
         fields.push([null, null, null, null, null, null, null]);
@@ -77,6 +82,10 @@ export class GameBoard extends React.Component {
             const model = new UnitModel({team, type, visible})
             fields[unit.location.y][unit.location.x] = model;
         })
+
+        if (fight) {
+            fields[fight.location.y][fight.location.x] = new UnitModel({type: UnitType.FIGHT})
+        }
 
         return fields;
     }
@@ -104,7 +113,7 @@ export class GameBoard extends React.Component {
         // clicking on own unit
         if (unit !== null && unit.team === this.team && this.team === this.state.activeTeam) {
             switch (this.state.gameState) {
-                case "SELECT_UNIT":
+                case "TURN":
                 case "MOVE_UNIT":
                     this.setState({
                         selectedField: {x, y},
@@ -124,8 +133,19 @@ export class GameBoard extends React.Component {
         // clicking on invalid field
         this.setState({
             selectedField: null,
-            gameState: GameState.SELECT_UNIT
+            gameState: GameState.TURN
         })
+    }
+
+    handleFightUnitChosen(unitType) {
+        axios({
+            method: 'post',
+            url: AppConfig.backendUrl + `/game/${this.props.gameId}/fight/choose`,
+            data: {unitType: unitType.api},
+            params: {
+                requestingPlayer: this.team.api
+            }
+        }).then(this.handleBoardResponse.bind(this))
     }
 
     render() {
@@ -150,6 +170,8 @@ export class GameBoard extends React.Component {
             fields.push(<div key={`row_${y}`} className="gameboard_row">{row}</div>);
         }
 
+        const unitSelector = this.state.gameState === GameState.FIGHT ?
+            <UnitSelector team={this.team} onChooseUnit={this.handleFightUnitChosen} /> : null;
         return (
             <div className="container">
                 <div className="state">GameBoard | Turn: <span
@@ -158,6 +180,7 @@ export class GameBoard extends React.Component {
                 <div className="gameboard">
                     {fields}
                 </div>
+                {unitSelector}
             </div>
         )
     }
