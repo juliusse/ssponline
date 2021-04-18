@@ -1,0 +1,14 @@
+import com.bmuschko.gradle.docker.tasks.image.*
+
+plugins {
+    id 'com.github.node-gradle.node' version '3.0.1'
+    id 'com.bmuschko.docker-remote-api' version '6.7.0'
+}
+
+group = 'info.seltenheim'
+version = '0.0.1-SNAPSHOT'
+
+task buildImage(type: DockerBuildImage) {
+    inputDir = file('./')
+    images.add('ssponline.de/ssponline_frontend:latest')
+}
