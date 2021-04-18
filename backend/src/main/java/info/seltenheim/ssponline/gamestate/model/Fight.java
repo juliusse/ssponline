@@ -39,7 +39,7 @@ public class Fight {
     }
 
     public void setChoiceForTeam(Team team, UnitType type) {
-        if(team == Team.RED) {
+        if (team == Team.RED) {
             setRedChoice(type);
         } else {
             setBlueChoice(type);

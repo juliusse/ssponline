@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface UnitRepository extends JpaRepository<Unit, Long> {
     // read
     List<Unit> findAllByGameId(String gameId);
+
     Optional<Unit> findByGameIdAndLocation(String gameId, Point location);
 
     // update

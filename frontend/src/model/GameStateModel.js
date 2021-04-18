@@ -10,6 +10,8 @@ export class GameStateModel {
         this.activeTeam = null;
         this.gameState = null;
         this.board = null;
+        this.acceptedUnits = false;
+        this.acceptedSpecialUnits = false;
         this.fightLocation = null;
         this.fightChoice = null;
     }
@@ -31,6 +33,8 @@ export class GameStateModel {
             this.processActionShuffleUnits(action);
         } else if (action.actionType === 'ACCEPT_UNITS') {
             this.processActionAcceptUnits(action);
+        } else if (action.actionType === 'SET_SPECIAL_UNITS') {
+            this.processActionSetSpecialUnits(action);
         } else if (action.actionType === 'START') {
             this.processActionGameStart(action);
         } else if (action.actionType === 'MOVE') {
@@ -72,7 +76,27 @@ export class GameStateModel {
     }
 
     processActionAcceptUnits(acceptTurnAction) {
-        // todo
+        const team = Team[acceptTurnAction.team];
+
+        if(team === this.playerTeam) {
+            this.acceptedUnits = true;
+        }
+    }
+
+    processActionSetSpecialUnits(setSpecialUnitsAction) {
+        const board = this.board;
+        setSpecialUnitsAction
+            .units
+            .forEach(unit => {
+                const team = Team[unit.team];
+                const type = UnitType[unit.type];
+                const visible = UnitType[unit.visible];
+                board[unit.location.y][unit.location.x] = new UnitModel({team, type, visible});
+            });
+
+        if(Team[setSpecialUnitsAction.team] === this.playerTeam) {
+            this.acceptedSpecialUnits = true;
+        }
     }
 
     processActionGameStart(gameStartAction) {
@@ -95,7 +119,9 @@ export class GameStateModel {
             const winningUnit = fightAction.winningTeam === 'RED' ? fightAction.redType : fightAction.blueType;
             board[fightAction.location.y][fightAction.location.x] =
                 new UnitModel({team: winningTeam, type: UnitType[winningUnit], visible: true});
+            this.fightLocation = null;
         } else {
+            this.fightLocation = fightAction.location;
             board[fightAction.location.y][fightAction.location.x] =
                 new UnitModel({type: UnitType.FIGHT});
         }

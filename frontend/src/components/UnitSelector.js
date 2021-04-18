@@ -2,7 +2,7 @@ import React from "react";
 import {Unit} from "./Unit";
 import {UnitModel} from "../model/UnitModel";
 import {UnitType} from "../constants/Constants";
-import "./unitSelector.css"
+import "./UnitSelector.css"
 
 export class UnitSelector extends React.Component {
     constructor(props) {
@@ -17,9 +17,15 @@ export class UnitSelector extends React.Component {
     render() {
         return (
             <div className="unitSelector">
-                <Unit onClick={this.handleClick} model={new UnitModel({team: this.props.team, type: UnitType.ROCK})} />
-                <Unit onClick={this.handleClick} model={new UnitModel({team: this.props.team, type: UnitType.PAPER})} />
-                <Unit onClick={this.handleClick} model={new UnitModel({team: this.props.team, type: UnitType.SCISSORS})} />
+                <Unit isActive={this.props.choice === UnitType.ROCK}
+                      onClick={this.handleClick}
+                      model={new UnitModel({team: this.props.team, type: UnitType.ROCK})}/>
+                <Unit isActive={this.props.choice === UnitType.PAPER}
+                      onClick={this.handleClick}
+                      model={new UnitModel({team: this.props.team, type: UnitType.PAPER})}/>
+                <Unit isActive={this.props.choice === UnitType.SCISSORS}
+                      onClick={this.handleClick}
+                      model={new UnitModel({team: this.props.team, type: UnitType.SCISSORS})}/>
             </div>
         );
     }

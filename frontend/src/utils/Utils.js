@@ -14,3 +14,10 @@ export const isAdjacent = (center, otherField) => {
         return Direction.RIGHT;
     }
 }
+
+export const pointEqual = (point1, point2) => {
+    if(!point1 || !point2) {
+        return false;
+    }
+    return point1.x === point2.x && point1.y === point2.y;
+}

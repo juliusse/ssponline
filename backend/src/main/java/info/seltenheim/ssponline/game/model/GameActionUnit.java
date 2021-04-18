@@ -1,27 +1,32 @@
 package info.seltenheim.ssponline.game.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "game_action_unit")
-@IdClass(GameActionUnit.IdClass.class)
 public class GameActionUnit {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
     @ManyToOne
-    @JoinColumn(name="game_action_id", nullable=false)
+    @JoinColumn(name = "game_action_id", nullable = false)
     private GameAction gameActionId;
 
-    @Id
+    @Column(name = "x")
     private int x;
 
-    @Id
+    @Column(name = "y")
     private int y;
 
     @Column(name = "team")
@@ -39,10 +44,12 @@ public class GameActionUnit {
         return new Point(x, y);
     }
 
-    @Data
-    public static class IdClass implements Serializable {
-        private String gameActionId;
-        private int x;
-        private int y;
+    public GameActionUnit(GameAction gameActionId, int x, int y, Team team, UnitType type, boolean isVisible) {
+        this.gameActionId = gameActionId;
+        this.x = x;
+        this.y = y;
+        this.team = team;
+        this.type = type;
+        this.isVisible = isVisible;
     }
 }

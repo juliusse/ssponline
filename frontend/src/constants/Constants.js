@@ -14,7 +14,7 @@ export const Team = {
 }
 
 export const GameState = {
-    CONFIGURE: 'CONFIGURE',
+    SETUP: 'SETUP',
     TURN: 'TURN',
     FIGHT: 'FIGHT',
 }
@@ -24,16 +24,19 @@ export const UnitType = {
     ROCK: {
         api: 'ROCK',
         name: 'rock',
+        isMovable: true,
         src: (color) => `/assets/img/${theme}/${color}_stein.gif`,
     },
     PAPER: {
         api: 'PAPER',
         name: 'paper',
+        isMovable: true,
         src: (color) => `/assets/img/${theme}/${color}_papier.gif`,
     },
     SCISSORS: {
         api: 'SCISSORS',
         name: 'scissors',
+        isMovable: true,
         src: (color) => `/assets/img/${theme}/${color}_schere.gif`,
     },
     TRAP: {
@@ -44,7 +47,7 @@ export const UnitType = {
     FLAG: {
         api: 'FLAG',
         name: 'flag',
-        src: (color) => `/assets/img/${theme}/${color}_flagge.gif`
+        src: (color) => `/assets/img/${theme}/${color}_fahne.gif`
     },
     HIDDEN: {
         api: 'HIDDEN',
