@@ -1,0 +1,37 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Backend Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Run tests
+        run: ./gradlew backend:test
+      - name: Build Image
+        run: ./gradlew backend:bootBuildImage
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+      - name: Push the image
+        run: docker push docker.pkg.github.com/juliusse/ssponline/backend:latest
+      - name: Add ssh key
+        run: echo "${{ secrets.AWS_SSH_KEY}}" >> ~/ssh_key && chmod 600 ~/ssh_key
+      - name: Update Deployment
+        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ec2-user@18.156.4.123 "docker pull docker.pkg.github.com/juliusse/ssponline/backend:latest; docker stop ssponline_backend; docker rm ssponline_backend; docker run -d -p 8081:8081 -m 2000000000 --name ssponline_backend -d docker.pkg.github.com/juliusse/ssponline/backend:latest"
