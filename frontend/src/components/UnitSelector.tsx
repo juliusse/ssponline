@@ -3,14 +3,23 @@ import {Unit} from "./Unit";
 import {UnitModel} from "../model/UnitModel";
 import {UnitType} from "../constants/Constants";
 import "./UnitSelector.css"
+import {Team} from "../model/Team";
 
-export class UnitSelector extends React.Component {
-    constructor(props) {
+type Props = {
+    onChooseUnit: Function;
+    choice: UnitType | null;
+    team: Team;
+}
+
+type State = {}
+
+export class UnitSelector extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         this.handleClick = this.handleClick.bind(this);
     }
 
-    handleClick(unitType) {
+    handleClick(unitType: UnitType) {
         this.props.onChooseUnit(unitType);
     }
 
@@ -19,13 +28,13 @@ export class UnitSelector extends React.Component {
             <div className="unitSelector">
                 <Unit isActive={this.props.choice === UnitType.ROCK}
                       onClick={this.handleClick}
-                      model={new UnitModel({team: this.props.team, type: UnitType.ROCK})}/>
+                      model={new UnitModel(this.props.team, UnitType.ROCK, false)}/>
                 <Unit isActive={this.props.choice === UnitType.PAPER}
                       onClick={this.handleClick}
-                      model={new UnitModel({team: this.props.team, type: UnitType.PAPER})}/>
+                      model={new UnitModel(this.props.team, UnitType.PAPER, false)}/>
                 <Unit isActive={this.props.choice === UnitType.SCISSORS}
                       onClick={this.handleClick}
-                      model={new UnitModel({team: this.props.team, type: UnitType.SCISSORS})}/>
+                      model={new UnitModel(this.props.team, UnitType.SCISSORS, false)}/>
             </div>
         );
     }
