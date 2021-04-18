@@ -36,6 +36,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       - name: pull image for commit
         run: docker pull docker.pkg.github.com/juliusse/ssponline/frontend:$GITHUB_SHA
       - name: Retag image to latest
