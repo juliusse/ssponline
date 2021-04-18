@@ -1,5 +1,8 @@
-package info.seltenheim.ssponline.game.model;
+package info.seltenheim.ssponline.gamestate.model;
 
+import info.seltenheim.ssponline.game.model.Point;
+import info.seltenheim.ssponline.game.model.Team;
+import info.seltenheim.ssponline.game.model.UnitType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +13,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "unit")
+@Entity(name = "game_state_unit")
 public class Unit implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

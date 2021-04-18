@@ -5,13 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 
 @Embeddable
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Point {
+public class Point implements Serializable {
     private int x;
     private int y;
 }

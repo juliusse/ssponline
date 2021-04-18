@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GameRepository extends JpaRepository<Game, String> {
 
-    // update
-    @Modifying
-    @Query("UPDATE info.seltenheim.ssponline.game.model.Game g SET g.activeTeam = :team WHERE id = :gameId")
-    void updateActiveTeam(String gameId, Team team);
+//    // update
+//    @Modifying
+//    @Query("UPDATE info.seltenheim.ssponline.game.model.Game g SET g.activeTeam = :team WHERE id = :gameId")
+//    void updateActiveTeam(String gameId, Team team);
 }
