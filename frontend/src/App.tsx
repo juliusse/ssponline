@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import { GameBoard } from './components/GameBoard';
+import {Team} from "./model/Team";
 
 function getQueryVariable(variable: String) {
     const query = window.location.search.substring(1);
@@ -16,8 +17,8 @@ function getQueryVariable(variable: String) {
 function App() {
   const devMode = getQueryVariable('dev') || false;
   const gameId = getQueryVariable('gameId') || 'dev';
-  const team = getQueryVariable('team') || 'RED';
-  const otherTeam = team === 'RED' ? 'BLUE' : 'RED';
+  const team = Team.getForColor(getQueryVariable('team') || 'RED');
+  const otherTeam = team === Team.RED ? Team.BLUE: Team.RED;
 
   const devBoard = devMode ? <GameBoard team={otherTeam} gameId={gameId}/> : null;
 

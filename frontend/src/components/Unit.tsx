@@ -1,14 +1,25 @@
 import React from "react";
 import './Unit.css';
+import {UnitModel} from "../model/UnitModel";
 
-export class Unit extends React.Component {
-    constructor(props) {
+type UnitProps = {
+    model: UnitModel | null;
+    onClick: Function | null;
+    isActive: boolean;
+}
+
+type UnitState = {
+
+}
+
+export class Unit extends React.Component<UnitProps, UnitState> {
+    constructor(props: UnitProps) {
         super(props);
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleClick() {
-        if (!this.props.onClick) {
+        if (!this.props.onClick || !this.props.model) {
             return;
         }
         this.props.onClick(this.props.model.type);
@@ -22,7 +33,7 @@ export class Unit extends React.Component {
             <div className={this.props.isActive ? 'unit active' : 'unit'}
                  onClick={this.handleClick}>
                 <img alt={this.props.model.getName()}
-                     src={this.props.model.getImage(this.props.isMyTeamsTurn)}
+                     src={this.props.model.getImage()}
                 />
             </div>
         );

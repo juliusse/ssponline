@@ -1,7 +1,14 @@
 import React from "react";
 import "./UnitSelector.css"
 
-export class GameStartOptions extends React.Component {
+type Props = {
+    onShuffleClick: React.MouseEventHandler<HTMLButtonElement>;
+    onAcceptClick: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+type State = {}
+
+export class GameStartOptions extends React.Component<Props, State> {
     render() {
         return (
             <span className="gameStartOptions">
