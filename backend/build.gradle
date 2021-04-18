@@ -15,7 +15,7 @@ configurations {
 }
 
 bootBuildImage {
-	imageName = "ssponline.de/ssponline_backend"
+	imageName = "docker.pkg.github.com/juliusse/ssponline/backend"
 }
 
 repositories {
