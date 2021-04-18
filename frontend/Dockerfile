@@ -16,4 +16,4 @@ RUN npm run build
 
 # start app
 RUN npm install -g serve
-CMD ["serve", "-s", "build"]
+ENTRYPOINT ["serve", "-s", "build"]
