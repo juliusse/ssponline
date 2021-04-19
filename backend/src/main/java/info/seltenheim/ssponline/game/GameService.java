@@ -98,21 +98,36 @@ public class GameService {
 
     private void processAcceptUnitsAction(String gameId, Team team, GameAction lastAction, GameActionAcceptUnitsRequestDTO request) {
         final var action = gameActionRepository.save(new GameActionAcceptUnits(gameId, lastAction.getActionId() + 1, team));
-        final var gameState = gameStateService.processAction(action);
+    }
 
-//        if (gameState.isRedAcceptedUnits() && gameState.isBlueAcceptedUnits()) {
-//            final var redAcceptAction =
-//                    processActionSetSpecialUnits(gameId, Team.RED, action, new GameActionSetSpecialUnitsRequestDTO()
-//                            .setFlag(new Point(3, 0))
-//                            .setTrap1(new Point(2, 1))
-//                            .setTrap2(new Point(5, 1)));
-//            processActionSetSpecialUnits(gameId, Team.BLUE, redAcceptAction, new GameActionSetSpecialUnitsRequestDTO()
-//                    .setFlag(new Point(3, 5))
-//                    .setTrap1(new Point(2, 4))
-//                    .setTrap2(new Point(5, 4)));
-//
-//
-//        }
+    private void validateUnitPositions(Point trap1, Point trap2, Point flag) {
+        if (flag.equals(0, 0)) {
+            if (trap1.equals(0, 1) && trap2.equals(1, 0) ||
+                    trap2.equals(0, 1) && trap1.equals(1, 0)) {
+                throw new IllegalArgumentException("Invalid position combination!");
+            }
+        }
+
+        if (flag.equals(6, 0)) {
+            if (trap1.equals(5, 0) && trap2.equals(6, 1) ||
+                    trap2.equals(5, 0) && trap1.equals(6, 1)) {
+                throw new IllegalArgumentException("Invalid position combination!");
+            }
+        }
+
+        if (flag.equals(0, 5)) {
+            if (trap1.equals(0, 4) && trap2.equals(1, 5) ||
+                    trap2.equals(0, 4) && trap1.equals(1, 5)) {
+                throw new IllegalArgumentException("Invalid position combination!");
+            }
+        }
+
+        if (flag.equals(6, 5)) {
+            if (trap1.equals(5, 5) && trap2.equals(6, 4) ||
+                    trap2.equals(5, 5) && trap1.equals(6, 4)) {
+                throw new IllegalArgumentException("Invalid position combination!");
+            }
+        }
     }
 
     private GameActionSetSpecialUnits processActionSetSpecialUnits(String gameId, Team team, GameAction lastAction, GameActionSetSpecialUnitsRequestDTO request) {
@@ -121,6 +136,7 @@ public class GameService {
         final var trap2 = request.getTrap2();
         final var flag = request.getFlag();
 
+        validateUnitPositions(trap1, trap2, flag);
         final var units = new ArrayList<GameActionUnit>();
         units.add(gameActionUnitRepository
                 .save(new GameActionUnit(action, trap1.getX(), trap1.getY(), team, UnitType.TRAP, false)));

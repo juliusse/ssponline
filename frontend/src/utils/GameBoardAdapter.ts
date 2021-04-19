@@ -12,10 +12,6 @@ export type GameActionsListResponse = {
     gameActions: Array<GameAction>;
 }
 
-export type GameActionsPlainListResponse = {
-    gameActions: Array<GameActionResponse>;
-}
-
 export class GameBoardAdapter {
     readonly gameId: string;
     readonly requestingTeam: Team;
@@ -83,7 +79,11 @@ export class GameBoardAdapter {
     }
 
     toGameAction(response: string): GameActionsListResponse {
-        const gameActions = JSON.parse(response).gameActions
+        const responseJson = JSON.parse(response);
+        if (responseJson.statusCode) {
+            return responseJson;
+        }
+        const gameActions = responseJson.gameActions
             .map((action: GameActionResponse) => {
                 const actionType = GameActionType[action.actionType as keyof typeof GameActionType];
                 const activeTeam = action.activeTeam ? Team.getForColor(action.activeTeam) : null;

@@ -4,20 +4,15 @@ import info.seltenheim.ssponline.game.dto.GameDTO;
 import info.seltenheim.ssponline.game.dto.action.request.GameActionRequestDTO;
 import info.seltenheim.ssponline.game.model.Team;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
 import java.util.stream.Collectors;
 
 import static info.seltenheim.ssponline.game.dto.action.response.GameActionResponseDTOs.toGameActionDTO;
 
 @RestController
 @RequiredArgsConstructor
-//@Transactional(isolation = Isolation.READ_COMMITTED)
 public class GameController {
-    private final EntityManager entityManager;
     private final GameService gameService;
 
     @GetMapping("/game/{gameId}")
