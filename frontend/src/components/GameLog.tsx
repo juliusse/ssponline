@@ -78,6 +78,14 @@ export class GameLog extends React.Component<Props, State> {
                         chose a unit for the fight;
                     </div>;
                 break;
+            case GameActionType.WIN:
+                content =
+                    <div className='GameLogEntryContent'>
+                        GAME OVER!{' '}
+                        <span className={action.team?.getName()}>{action.team?.getName()}</span>
+                        {' '} won the game!
+                    </div>;
+                break;
         }
 
         const time = (

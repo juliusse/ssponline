@@ -6,5 +6,6 @@ export enum GameActionType {
     START = "START",
     MOVE = "MOVE",
     FIGHT = "FIGHT",
-    FIGHT_CHOOSE_UNIT = "FIGHT_CHOOSE_UNIT"
+    FIGHT_CHOOSE_UNIT = "FIGHT_CHOOSE_UNIT",
+    WIN = "WIN",
 }

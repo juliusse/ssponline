@@ -228,6 +228,18 @@ public class GameService {
                 winningTeam);
         gameActionRepository.save(fightAction);
         gameStateService.processAction(fightAction);
+
+        final var losingTeam = winner == FightResult.RED_WINS ? Team.BLUE : Team.RED;
+        final var losingUnit = winningTeam == Team.RED ? blueType : redType;
+        if (losingUnit == UnitType.FLAG || !gameStateService.hasTeamStillUnits(gameId, losingTeam)) {
+            finishGame(gameId, fightAction.getActionId(), winningTeam);
+        }
+    }
+
+    private void finishGame(String gameId, long lastActionId, Team winningTeam) {
+        final var action = new GameActionWin(gameId, lastActionId + 1, winningTeam);
+        gameActionRepository.save(action);
+        gameStateService.processAction(action);
     }
 
     private Team getOtherTeam(Team team) {
@@ -239,7 +251,7 @@ public class GameService {
             return FightResult.TIE;
         } else if (blueType == UnitType.FLAG || redType == UnitType.TRAP) {
             return FightResult.RED_WINS;
-        } else if (blueType == UnitType.TRAP || blueType== UnitType.FLAG) {
+        } else if (blueType == UnitType.TRAP || blueType == UnitType.FLAG) {
             return FightResult.BLUE_WINS;
         } else if ((redType == UnitType.ROCK && blueType == UnitType.SCISSORS)
                 || (redType == UnitType.SCISSORS && blueType == UnitType.PAPER)

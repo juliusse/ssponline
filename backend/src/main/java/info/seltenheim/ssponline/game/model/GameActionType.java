@@ -8,5 +8,6 @@ public enum GameActionType {
     START,
     MOVE,
     FIGHT,
-    FIGHT_CHOOSE_UNIT
+    FIGHT_CHOOSE_UNIT,
+    WIN,
 }
