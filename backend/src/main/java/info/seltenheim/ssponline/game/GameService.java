@@ -229,12 +229,11 @@ public class GameService {
         gameActionRepository.save(fightAction);
         gameStateService.processAction(fightAction);
 
+        final var losingTeam = winner == FightResult.RED_WINS ? Team.BLUE : Team.RED;
         final var losingUnit = winningTeam == Team.RED ? blueType : redType;
-        if (losingUnit == UnitType.FLAG) {
+        if (losingUnit == UnitType.FLAG || !gameStateService.hasTeamStillUnits(gameId, losingTeam)) {
             finishGame(gameId, fightAction.getActionId(), winningTeam);
         }
-
-
     }
 
     private void finishGame(String gameId, long lastActionId, Team winningTeam) {

@@ -134,4 +134,14 @@ public class GameStateService {
     public Optional<Unit> findUnitInLocation(@NonNull String gameId, @NonNull Point location) {
         return unitService.findUnitInLocation(gameId, location);
     }
+
+    public boolean hasTeamStillUnits(String gameId, Team team) {
+        return unitService.getUnitsForGame(gameId)
+                .stream()
+                .filter(unit -> unit.getTeam() == team)
+                .anyMatch(unit ->
+                        unit.getType() == UnitType.ROCK ||
+                                unit.getType() == UnitType.PAPER ||
+                                unit.getType() == UnitType.SCISSORS);
+    }
 }
