@@ -1,4 +1,5 @@
 import React from 'react';
+import './GameBoard.css';
 import {GameBoardField} from "./GameBoardField";
 import {GameState, UnitType} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
@@ -108,8 +109,20 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
             return <div/>;
         }
         const fields = [];
+        fields.push(<div key={`row_header`} className="gameboard_row">
+                <div className='gameboard_row_number'/>
+                <div className='gameboard_column_number'><span>1</span></div>
+                <div className='gameboard_column_number'><span>2</span></div>
+                <div className='gameboard_column_number'><span>3</span></div>
+                <div className='gameboard_column_number'><span>4</span></div>
+                <div className='gameboard_column_number'><span>5</span></div>
+                <div className='gameboard_column_number'><span>6</span></div>
+                <div className='gameboard_column_number'><span>7</span></div>
+            </div>
+        )
         for (let y = 0; y < 6; y++) {
             const row = [];
+            row.push(<div className="gameboard_row_number" key={`row-number-${y+1}`}><span>{y + 1}</span></div>)
             for (let x = 0; x < 7; x++) {
                 const color = (x + y) % 2 === 0 ? "green" : "white";
                 row.push(<GameBoardField

@@ -10,6 +10,7 @@ import {Team} from "../model/Team";
 import {Point} from "../model/Point";
 import {AxiosResponse} from "axios";
 import {GameBoard} from "./GameBoard";
+import {GameLog} from "./GameLog";
 
 type Props = {
     team: Team
@@ -251,6 +252,7 @@ export class Game extends React.Component<Props, State> {
                                    team={this.team}
                                    choice={this.state.gameState.fightChoice}
                                    onChooseUnit={this.handleFightUnitChosen}/>
+                <GameLog gameActions={this.state.gameState.actions} />
             </div>
         )
     }

@@ -65,6 +65,8 @@ export class GameStateModel {
         this.activeTeam = action.activeTeam;
         this.gameState = action.gameState;
         this.lastProcessedAction = action.actionId;
+
+        this.actions.push(action);
     }
 
     processActionConfigure(configureAction: GameAction) {
