@@ -14,4 +14,8 @@ import java.io.Serializable;
 public class Point implements Serializable {
     private int x;
     private int y;
+
+    public boolean equals(int x, int y) {
+        return this.getX() == x && this.getY() == y;
+    }
 }
