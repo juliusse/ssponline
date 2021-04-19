@@ -233,6 +233,8 @@ public class GameService {
         if (losingUnit == UnitType.FLAG) {
             finishGame(gameId, fightAction.getActionId(), winningTeam);
         }
+
+
     }
 
     private void finishGame(String gameId, long lastActionId, Team winningTeam) {
