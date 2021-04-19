@@ -11,6 +11,7 @@ import {GameSetupState} from "./Game";
 type GameBoardProps = {
     team: Team;
     gameState: GameStateModel;
+    isShadowState: boolean;
     setUpUnits: GameSetupState;
     onMoveUnit: Function;
     onPlaceSpecialUnit: Function;
@@ -43,6 +44,10 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
     }
 
     handleFieldClick(location: Point) {
+        if (this.props.isShadowState) {
+            return;
+        }
+
         const gameState = this.props.gameState;
 
         if (gameState.gameState === GameState.SETUP) {
@@ -122,7 +127,7 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
         )
         for (let y = 0; y < 6; y++) {
             const row = [];
-            row.push(<div className="gameboard_row_number" key={`row-number-${y+1}`}><span>{y + 1}</span></div>)
+            row.push(<div className="gameboard_row_number" key={`row-number-${y + 1}`}><span>{y + 1}</span></div>)
             for (let x = 0; x < 7; x++) {
                 const color = (x + y) % 2 === 0 ? "green" : "white";
                 row.push(<GameBoardField

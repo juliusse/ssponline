@@ -6,12 +6,22 @@ import {Team} from "../model/Team";
 import moment from "moment";
 
 type Props = {
-    gameActions: Array<GameAction>
+    displayedUntilActionId: number | null;
+    gameActions: Array<GameAction>;
+    onActionClick: Function;
 }
 
 type State = {}
 
 export class GameLog extends React.Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+        // this.handleClick = this.handleClick.bind(this);
+    }
+
+    // handleClick() {
+    //     this.props.onActionClick(element.arguments.actionId);
+    // }
 
     toLogLine(action: GameAction): JSX.Element {
         let content = null;
@@ -94,9 +104,15 @@ export class GameLog extends React.Component<Props, State> {
                 <div className='GameLogEntryTimeContent'><span>{moment(action.timestamp).fromNow()}</span></div>
                 ]
             </div>);
-
+        const active = !this.props.displayedUntilActionId || action.actionId <= this.props.displayedUntilActionId;
+        const activeClass = active ? 'active' : 'disabled';
+        const handleClick = () => {
+            this.props.onActionClick(action.actionId);
+        }
         return (
-            <div key={`action_${action.actionId}`} className='GameLogEntry'>
+            <div key={`action_${action.actionId}`}
+                 className={`GameLogEntry ${activeClass}`}
+                 onClick={handleClick}>
                 {time}
                 {content}
             </div>
@@ -108,7 +124,7 @@ export class GameLog extends React.Component<Props, State> {
             .props
             .gameActions
             .reverse()
-            .map(this.toLogLine);
+            .map(this.toLogLine.bind(this));
         return (
             <div className='GameLog'>
                 {entries}
