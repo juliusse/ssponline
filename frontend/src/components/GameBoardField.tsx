@@ -4,12 +4,12 @@ import {Unit} from "./Unit";
 import {GameState, UNIT_THEME, UnitType} from "../constants/Constants";
 import {Point} from "../model/Point";
 import {GameStateModel} from "../model/GameStateModel";
-import {GameBoardSetupState} from "./GameBoard";
 import {UnitModel} from "../model/UnitModel";
+import {GameSetupState} from "./Game";
 
 type GameBoardFieldProps = {
     state: GameStateModel;
-    setUpUnits: GameBoardSetupState;
+    setUpUnits: GameSetupState;
     selectedField: Point | null;
     location: Point;
     color: string;

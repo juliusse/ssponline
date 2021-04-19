@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
-import { GameBoard } from './components/GameBoard';
 import {Team} from "./model/Team";
+import {Game} from "./components/Game";
 
 function getQueryVariable(variable: String) {
     const query = window.location.search.substring(1);
@@ -15,19 +15,19 @@ function getQueryVariable(variable: String) {
 }
 
 function App() {
-  const devMode = getQueryVariable('dev') || false;
-  const gameId = getQueryVariable('gameId') || 'dev';
-  const team = Team.getForColor(getQueryVariable('team') || 'RED');
-  const otherTeam = team === Team.RED ? Team.BLUE: Team.RED;
+    const devMode = getQueryVariable('dev') || false;
+    const gameId = getQueryVariable('gameId') || 'dev';
+    const team = Team.getForColor(getQueryVariable('team') || 'RED');
+    const otherTeam = team === Team.RED ? Team.BLUE : Team.RED;
 
-  const devBoard = devMode ? <GameBoard team={otherTeam} gameId={gameId}/> : null;
+    const devBoard = devMode ? <Game team={otherTeam} gameId={gameId}/> : null;
 
-  return (
-      <div>
-        <GameBoard team={team} gameId={gameId}/>
-        {devBoard}
-      </div>
-  );
+    return (
+        <div>
+            <Game team={team} gameId={gameId}/>
+            {devBoard}
+        </div>
+    );
 }
 
 export default App;

@@ -9,6 +9,7 @@ import {Ensure} from "../utils/Ensure";
 export class GameStateModel {
     readonly playerTeam: Team;
     gameId: string | null;
+    actions: Array<GameAction>
     lastProcessedAction: number;
     activeTeam: Team | null;
     gameState: GameState | null;
@@ -19,8 +20,9 @@ export class GameStateModel {
     fightChoice: UnitType | null;
 
     constructor(playerTeam: Team) {
-        this.gameId = null;
         this.playerTeam = playerTeam;
+        this.gameId = null;
+        this.actions = [];
         this.lastProcessedAction = -1;
         this.activeTeam = null;
         this.gameState = null;
@@ -60,8 +62,8 @@ export class GameStateModel {
             this.processActionFightChooseUnit(action);
         }
 
-        this.activeTeam = action.activeTeam ? Team.getForColor(action.activeTeam) : null;
-        this.gameState = GameState[action.gameState as keyof typeof GameState];
+        this.activeTeam = action.activeTeam;
+        this.gameState = action.gameState;
         this.lastProcessedAction = action.actionId;
     }
 
@@ -86,15 +88,15 @@ export class GameStateModel {
         shuffleUnitsAction
             .units!
             .forEach(unit => {
-                const team = Team.getForColor(unit.team);
-                const type = UnitType[unit.type as keyof typeof UnitType];
+                const team = unit.team;
+                const type = unit.type;
                 const visible = unit.visible;
                 board![unit.location.y][unit.location.x] = new UnitModel(team, type, visible);
             });
     }
 
     processActionAcceptUnits(acceptTurnAction: GameAction) {
-        const team = Team.getForColor(acceptTurnAction.team!);
+        const team = acceptTurnAction.team;
 
         if (team === this.playerTeam) {
             this.acceptedUnits = true;
@@ -109,13 +111,13 @@ export class GameStateModel {
         setSpecialUnitsAction
             .units!
             .forEach(unit => {
-                const team = Team.getForColor(unit.team);
-                const type = UnitType[unit.type as keyof typeof UnitType];
+                const team = unit.team;
+                const type = unit.type;
                 const visible = unit.visible;
                 board![unit.location.y][unit.location.x] = new UnitModel(team, type, visible);
             });
 
-        if (Team.getForColor(setSpecialUnitsAction.team!) === this.playerTeam) {
+        if (setSpecialUnitsAction.team! === this.playerTeam) {
             this.acceptedSpecialUnits = true;
         }
     }
@@ -139,24 +141,24 @@ export class GameStateModel {
         const board = this.board;
 
         if (fightAction.winningTeam != null) {
-            const winningTeam = Team.getForColor(fightAction.winningTeam);
+            const winningTeam = fightAction.winningTeam;
             const winningUnit = winningTeam === Team.RED ? fightAction.redType : fightAction.blueType;
             board![fightAction.location!.y][fightAction.location!.x] =
-                new UnitModel(winningTeam, UnitType[winningUnit! as keyof typeof UnitType], true);
+                new UnitModel(winningTeam, winningUnit!, true);
             this.fightLocation = null;
         } else {
-            this.fightLocation = new Point(fightAction.location.x, fightAction.location.y);
+            this.fightLocation = new Point(fightAction.location!.x, fightAction.location!.y);
         }
 
         this.fightChoice = null;
     }
 
     processActionFightChooseUnit(chooseAction: GameAction) {
-        const team = Team.getForColor(chooseAction.team!);
+        const team = chooseAction.team!;
         if (team !== this.playerTeam) {
             return;
         }
 
-        this.fightChoice = UnitType[chooseAction.type! as keyof typeof UnitType];
+        this.fightChoice = chooseAction.type;
     }
 }
