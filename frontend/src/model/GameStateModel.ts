@@ -33,6 +33,11 @@ export class GameStateModel {
         this.fightChoice = null;
     }
 
+
+    getLastAction() {
+        return this.actions.length > 0 ? this.actions[this.actions.length - 1] : null;
+    }
+
     processActions(actions: Array<GameAction>) {
         actions.forEach(action => {
             if (action.actionId > this.lastProcessedAction) {
