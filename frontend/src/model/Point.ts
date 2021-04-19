@@ -14,4 +14,8 @@ export class Point {
 
         return this.x === point.x && this.y === point.y;
     }
+
+    public toString() {
+        return `{${this.x},${this.y}}`;
+    }
 }

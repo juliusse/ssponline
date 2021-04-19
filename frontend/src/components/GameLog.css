@@ -1,0 +1,15 @@
+.GameLog {
+    display: flex;
+    flex-direction: column;
+    width: 450px;
+    height: 100px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    overflow-y: visible;
+    border: solid 1px grey;
+}
+
+.GameLog .GameLogEntry {
+    margin: 1px 6px;
+    font-size: 10pt;
+}
