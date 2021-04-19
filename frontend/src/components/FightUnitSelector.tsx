@@ -1,11 +1,12 @@
 import React from "react";
 import {Unit} from "./Unit";
 import {UnitModel} from "../model/UnitModel";
-import {UnitType} from "../constants/Constants";
-import "./UnitSelector.css"
+import {GameState, UnitType} from "../constants/Constants";
+import "./FightUnitSelector.css"
 import {Team} from "../model/Team";
 
 type Props = {
+    gameState: GameState | null;
     onChooseUnit: Function;
     choice: UnitType | null;
     team: Team;
@@ -13,7 +14,7 @@ type Props = {
 
 type State = {}
 
-export class UnitSelector extends React.Component<Props, State> {
+export class FightUnitSelector extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.handleClick = this.handleClick.bind(this);
@@ -24,8 +25,12 @@ export class UnitSelector extends React.Component<Props, State> {
     }
 
     render() {
+        if (this.props.gameState !== GameState.FIGHT) {
+            return <div className="FightUnitSelector" />;
+        }
+
         return (
-            <div className="unitSelector">
+            <div className="FightUnitSelector">
                 <Unit isActive={this.props.choice === UnitType.ROCK}
                       onClick={this.handleClick}
                       model={new UnitModel(this.props.team, UnitType.ROCK, false)}/>
