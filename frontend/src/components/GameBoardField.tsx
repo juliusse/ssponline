@@ -2,11 +2,12 @@ import React from 'react';
 import './GameBoardField.sass';
 import {isAdjacent} from "../utils/Utils";
 import {Unit} from "./Unit";
-import {GameState, UNIT_THEME, UnitType} from "../constants/Constants";
+import {Direction, GameState, UNIT_THEME, UnitType} from "../constants/Constants";
 import {Point} from "../model/Point";
 import {GameStateModel} from "../model/GameStateModel";
 import {UnitModel} from "../model/UnitModel";
 import {GameSetupState} from "./Game";
+import {GameActionType} from "../model/gameaction/GameActionType";
 
 type GameBoardFieldProps = {
     state: GameStateModel;
@@ -32,7 +33,7 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
         this.props.onClick(this.location);
     }
 
-    getUnit() : UnitModel | null {
+    getUnit(): UnitModel | null {
         return this.props.state.board![this.location.y][this.location.x];
     }
 
@@ -68,6 +69,28 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
             if (this.location.isEqual(this.props.setUpUnits.flag)) {
                 const flag = new UnitModel(this.props.state.playerTeam, UnitType.FLAG, false);
                 content = <img alt={flag.getName()} src={flag.getImage()}/>
+            }
+        }
+
+        const lastAction = this.props.state.getLastAction();
+        if (lastAction && lastAction.actionType === GameActionType.MOVE) {
+            const adjacentDirection = isAdjacent(lastAction.to!, this.location);
+
+            if (this.location.isEqual(lastAction.from!) && adjacentDirection) {
+                switch (adjacentDirection) {
+                    case Direction.RIGHT:
+                        content = <img alt="direction" src={Direction.LEFT.src}/>
+                        break;
+                    case Direction.LEFT:
+                        content = <img alt="direction" src={Direction.RIGHT.src}/>
+                        break;
+                    case Direction.UP:
+                        content = <img alt="direction" src={Direction.DOWN.src}/>
+                        break;
+                    case Direction.DOWN:
+                        content = <img alt="direction" src={Direction.UP.src}/>
+                        break;
+                }
             }
         }
 

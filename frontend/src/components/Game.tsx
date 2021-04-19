@@ -36,14 +36,12 @@ export type GameSetupState = {
 export class Game extends React.Component<Props, State> {
     readonly team: Team;
     readonly gameBoardAdapter: GameBoardAdapter;
-    readonly actions: Array<GameAction>;
 
     private intervalId: number | null = null;
 
     constructor(props: Props) {
         super(props);
         this.team = props.team;
-        this.actions = [];
         this.gameBoardAdapter = new GameBoardAdapter(props.gameId, this.team);
         this.state = {
             gameState: new GameStateModel(this.team),
@@ -152,7 +150,7 @@ export class Game extends React.Component<Props, State> {
 
         const shadowGameState = new GameStateModel(this.team);
         for (let i = 0; i < actionId; i++) {
-            shadowGameState.processAction(this.actions[i])
+            shadowGameState.processAction(this.state.gameState.actions[i])
         }
 
         this.setState({
@@ -172,8 +170,6 @@ export class Game extends React.Component<Props, State> {
         } else {
             this.stopCheck();
         }
-
-        response.data.gameActions.forEach((action) => this.actions.push(action));
     }
 
     processActionError(error: AxiosError) {
