@@ -1,4 +1,5 @@
 import React from 'react';
+import './Game.sass';
 import {GameState, UnitType} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
 import {FightUnitSelector} from "./FightUnitSelector";
@@ -233,7 +234,7 @@ export class Game extends React.Component<Props, State> {
             <span className={gameState.activeTeam.getName()}>{gameState.activeTeam.getName()}</span> : null;
 
         return (
-            <div className="container">
+            <div className="Game">
                 <div className="state">GameBoard | Turn: {turnView} |
                     <GameStartOptions gameState={this.state.gameState}
                                       onShuffleClick={this.handleShuffleClick}

@@ -1,5 +1,5 @@
 import React from "react";
-import './GameLog.css';
+import './GameLog.sass';
 import {GameAction} from "../model/gameaction/GameAction";
 import {GameActionType} from "../model/gameaction/GameActionType";
 import {Team} from "../model/Team";
@@ -83,7 +83,7 @@ export class GameLog extends React.Component<Props, State> {
         const time = (
             <div className='GameLogEntryTime'>
                 [
-                <div className='GameLogEntryTimeContent'>{moment(action.timestamp).fromNow()}</div>
+                <div className='GameLogEntryTimeContent'><span>{moment(action.timestamp).fromNow()}</span></div>
                 ]
             </div>);
 

@@ -2,7 +2,7 @@ import React from "react";
 import {Unit} from "./Unit";
 import {UnitModel} from "../model/UnitModel";
 import {GameState, UnitType} from "../constants/Constants";
-import "./FightUnitSelector.css"
+import "./FightUnitSelector.sass"
 import {Team} from "../model/Team";
 
 type Props = {

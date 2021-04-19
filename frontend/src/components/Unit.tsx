@@ -1,5 +1,5 @@
 import React from "react";
-import './Unit.css';
+import './Unit.sass';
 import {UnitModel} from "../model/UnitModel";
 
 type UnitProps = {
@@ -30,7 +30,7 @@ export class Unit extends React.Component<UnitProps, UnitState> {
             return <div></div>;
         }
         return (
-            <div className={this.props.isActive ? 'unit active' : 'unit'}
+            <div className={this.props.isActive ? 'Unit active' : 'Unit'}
                  onClick={this.handleClick}>
                 <img alt={this.props.model.getName()}
                      src={this.props.model.getImage()}
