@@ -1,5 +1,6 @@
 export class GameActionResponse {
     readonly gameId: string;
+    readonly timestamp: number;
     readonly actionId: number;
     readonly actionType: string;
     readonly activeTeam: string | null;
@@ -11,6 +12,7 @@ export class GameActionResponse {
     readonly team: string | null = null;
 
     // move
+    readonly unitType: string | null = null;
     readonly from: any | null = null;
     readonly to: any | null = null;
 
@@ -24,8 +26,9 @@ export class GameActionResponse {
     readonly type: string | null = null;
 
 
-    constructor(gameId: string, actionId: number, actionType: string, activeTeam: string, gameState: string) {
+    constructor(gameId: string, timestamp: number, actionId: number, actionType: string, activeTeam: string, gameState: string) {
         this.gameId = gameId;
+        this.timestamp = timestamp;
         this.actionId = actionId;
         this.actionType = actionType;
         this.activeTeam = activeTeam;

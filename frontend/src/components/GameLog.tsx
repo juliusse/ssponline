@@ -3,6 +3,7 @@ import './GameLog.css';
 import {GameAction} from "../model/gameaction/GameAction";
 import {GameActionType} from "../model/gameaction/GameActionType";
 import {Team} from "../model/Team";
+import moment from "moment";
 
 type Props = {
     gameActions: Array<GameAction>
@@ -13,68 +14,85 @@ type State = {}
 export class GameLog extends React.Component<Props, State> {
 
     toLogLine(action: GameAction): JSX.Element {
+        let content = null;
         switch (action.actionType) {
             case GameActionType.CONFIGURE:
-                return (
-                    <div className='GameLogEntry'>
+                content =
+                    <div className='GameLogEntryContent'>
                         The game was created.
-                    </div>
-                );
+                    </div>;
+                break;
             case GameActionType.SHUFFLE_UNITS:
-                return (
-                    <div className='GameLogEntry'>
+                content =
+                    <div className='GameLogEntryContent'>
                         <span className={action.team?.getName()}>{action.team?.getName()}</span> shuffled their units.
-                    </div>
-                );
+                    </div>;
+                break;
             case GameActionType.ACCEPT_UNITS:
-                return (
-                    <div className='GameLogEntry'>
+                content =
+                    <div className='GameLogEntryContent'>
                         <span className={action.team?.getName()}>{action.team?.getName()}</span> accepted their units.
-                    </div>
-                );
+                    </div>;
+                break;
             case GameActionType.SET_SPECIAL_UNITS:
-                return (
-                    <div className='GameLogEntry'>
-                        <span className={action.team?.getName()}>{action.team?.getName()}</span> set their special units.
-                    </div>
-                );
+                content =
+                    <div className='GameLogEntryContent'>
+                        <span className={action.team?.getName()}>{action.team?.getName()}</span> set their special
+                        units.
+                    </div>;
+                break;
             case GameActionType.START:
-                return (
-                    <div className='GameLogEntry'>
+                content =
+                    <div className='GameLogEntryContent'>
                         Get Ready! The game starts!
-                    </div>
-                );
+                    </div>;
+                break;
             case GameActionType.MOVE:
-                return (
-                    <div className='GameLogEntry'>
+                content =
+                    <div className='GameLogEntryContent'>
                         <span className={action.team?.getName()}>{action.team?.getName()}</span>
-                        {' '}
-                        moved unit from {action.from!.toString()} to {action.to!.toString()}
-                    </div>
-                );
+                        {' '}moved{' '}
+                        <span className={action.team?.getName()}>{action.unitType}</span>
+                        {' '}from {action.from!.toString()} to {action.to!.toString()}
+                    </div>;
+                break;
             case GameActionType.FIGHT:
                 const winningTeamName = action.winningTeam?.getName();
-                const losingTeamName = (action.winningTeam === Team.RED ? Team.BLUE : Team.RED).getName();
-                return (
-                    <div className='GameLogEntry'>
+                const result = action.winningTeam ?
+                    <div>; <span className={winningTeamName}>{winningTeamName}</span> won!</div> :
+                    null
+                content =
+                    <div className='GameLogEntryContent'>
+                        Fight:
                         <span className={Team.RED.getName()}>{action.redType}</span> vs.
                         {' '}
-                        <span className={Team.BLUE.getName()}>{action.blueType}</span>;
+                        <span className={Team.BLUE.getName()}>{action.blueType}</span>
                         {' '}
-                        <span className={winningTeamName}>{winningTeamName}</span> won the fight!
-                    </div>
-                );
+                        {result}
+                    </div>;
+                break;
             case GameActionType.FIGHT_CHOOSE_UNIT:
-                return (
-                    <div className='GameLogEntry'>
+                content =
+                    <div className='GameLogEntryContent'>
                         <span className={action.team?.getName()}>{action.team?.getName()}</span>
-                        {' '}
                         chose a unit for the fight;
-                    </div>
-                );
+                    </div>;
+                break;
         }
 
-        return <div/>;
+        const time = (
+            <div className='GameLogEntryTime'>
+                [
+                <div className='GameLogEntryTimeContent'>{moment(action.timestamp).fromNow()}</div>
+                ]
+            </div>);
+
+        return (
+            <div key={`action_${action.actionId}`} className='GameLogEntry'>
+                {time}
+                {content}
+            </div>
+        )
     }
 
     render() {
@@ -82,10 +100,7 @@ export class GameLog extends React.Component<Props, State> {
             .props
             .gameActions
             .reverse()
-            .map(gameAction => {
-                return <div className='GameLogEntry'
-                            key={`action_${gameAction.actionId}`}>{this.toLogLine(gameAction)}</div>;
-            })
+            .map(this.toLogLine);
         return (
             <div className='GameLog'>
                 {entries}

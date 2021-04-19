@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GameActionResponseDTO {
     private String gameId;
+    private Long timestamp;
     private Long actionId;
     private GameActionType actionType;
     private Team activeTeam;

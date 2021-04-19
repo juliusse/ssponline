@@ -154,6 +154,9 @@ public class GameService {
                 lastAction.getActionId() + 1,
                 getOtherTeam(team),
                 nextState,
+                unitFrom.getTeam(),
+                unitFrom.getType(),
+                unitFrom.isVisible(),
                 request.getFrom(),
                 request.getTo());
         gameActionRepository.save(action);

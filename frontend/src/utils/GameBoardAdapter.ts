@@ -100,6 +100,7 @@ export class GameBoardAdapter {
                         }) : null;
                 const team = action.team ? Team.getForColor(action.team) : null;
 
+                const unitType = action.unitType ? UnitType[action.unitType as keyof typeof UnitType] : null;
                 const from = action.from ? new Point(action.from.x, action.from.y) : null;
                 const to = action.to ? new Point(action.to.x, action.to.y) : null;
 
@@ -112,12 +113,14 @@ export class GameBoardAdapter {
 
                 return new GameAction(
                     action.gameId,
+                    action.timestamp,
                     action.actionId,
                     actionType,
                     activeTeam,
                     gameState,
                     units,
                     team,
+                    unitType,
                     from,
                     to,
                     winningTeam,

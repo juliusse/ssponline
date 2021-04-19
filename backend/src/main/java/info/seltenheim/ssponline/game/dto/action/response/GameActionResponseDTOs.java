@@ -49,9 +49,12 @@ public class GameActionResponseDTOs {
         }
 
         if (gameAction instanceof GameActionMove) {
+            final var moveAction = (GameActionMove) gameAction;
             gameActionResponseDTO = new GameActionResponseMoveDTO()
-                    .setFrom(((GameActionMove) gameAction).getFrom())
-                    .setTo(((GameActionMove) gameAction).getTo());
+                    .setTeam(moveAction.getTeam())
+                    .setUnitType(toUnitTypeDTO(moveAction.getType(), moveAction.getTeam(), requestingTeam, moveAction.isVisible()))
+                    .setFrom(moveAction.getFrom())
+                    .setTo(moveAction.getTo());
         }
 
         if (gameAction instanceof GameActionFight) {
@@ -73,6 +76,7 @@ public class GameActionResponseDTOs {
 
         return gameActionResponseDTO
                 .setGameId(gameAction.getGameId())
+                .setTimestamp(gameAction.getCreatedDate())
                 .setActionId(gameAction.getActionId())
                 .setActionType(gameAction.getActionType())
                 .setActiveTeam(gameAction.getActiveTeam())

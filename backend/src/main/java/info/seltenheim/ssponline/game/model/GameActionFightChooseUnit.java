@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Getter
 @Setter
@@ -13,8 +15,11 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 public class GameActionFightChooseUnit extends GameAction {
     @Column(name = "team")
+    @Enumerated(EnumType.ORDINAL)
     private Team team;
+
     @Column(name = "unit_type")
+    @Enumerated(EnumType.ORDINAL)
     private UnitType type;
 
     public GameActionFightChooseUnit(String gameId, Long actionId, Team activeTeam, Team team, UnitType type) {

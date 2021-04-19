@@ -3,6 +3,8 @@ package info.seltenheim.ssponline.game.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
@@ -10,6 +12,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @Entity(name = "game_action")
+@EntityListeners(AuditingEntityListener.class)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class GameAction {
     @Id
@@ -18,6 +21,10 @@ public class GameAction {
 
     @Column(name = "game_id")
     private String gameId;
+
+    @Column(name = "created_date")
+    @CreatedDate
+    private long createdDate;
 
     @Column(name = "action_id")
     private Long actionId;

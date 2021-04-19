@@ -6,6 +6,7 @@ import {Point} from "../Point";
 
 export class GameAction {
     readonly gameId: string;
+    readonly timestamp: number;
     readonly actionId: number;
     readonly actionType: GameActionType;
     readonly activeTeam: Team | null;
@@ -17,6 +18,7 @@ export class GameAction {
     readonly team: Team | null = null;
 
     // move
+    readonly unitType: UnitType | null = null;
     readonly from: Point | null = null;
     readonly to: Point | null = null;
 
@@ -31,14 +33,16 @@ export class GameAction {
 
 
     // TODO split in sub classes
-    constructor(gameId: string, actionId: number, actionType: GameActionType, activeTeam: Team | null, gameState: GameState, units: Array<GameActionUnit> | null, team: Team | null, from: Point | null, to: Point | null, winningTeam: Team | null, redType: UnitType | null, blueType: UnitType | null, location: Point | null, type: UnitType | null) {
+    constructor(gameId: string, timestamp: number, actionId: number, actionType: GameActionType, activeTeam: Team | null, gameState: GameState, units: Array<GameActionUnit> | null, team: Team | null, unitType: UnitType | null, from: Point | null, to: Point | null, winningTeam: Team | null, redType: UnitType | null, blueType: UnitType | null, location: Point | null, type: UnitType | null) {
         this.gameId = gameId;
+        this.timestamp = timestamp;
         this.actionId = actionId;
         this.actionType = actionType;
         this.activeTeam = activeTeam;
         this.gameState = gameState;
         this.units = units;
         this.team = team;
+        this.unitType = unitType;
         this.from = from;
         this.to = to;
         this.winningTeam = winningTeam;
