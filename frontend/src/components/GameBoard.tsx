@@ -1,5 +1,5 @@
 import React from 'react';
-import './GameBoard.css';
+import './GameBoard.sass';
 import {GameBoardField} from "./GameBoardField";
 import {GameState, UnitType} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
@@ -140,7 +140,7 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
         }
 
         return (
-            <div className="gameboard">
+            <div className="GameBoard">
                 {fields}
             </div>
         )

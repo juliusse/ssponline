@@ -16,6 +16,6 @@ export class Point {
     }
 
     public toString() {
-        return `{${this.x},${this.y}}`;
+        return `{${this.x+1},${this.y+1}}`;
     }
 }

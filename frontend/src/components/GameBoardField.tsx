@@ -1,4 +1,5 @@
 import React from 'react';
+import './GameBoardField.sass';
 import {isAdjacent} from "../utils/Utils";
 import {Unit} from "./Unit";
 import {GameState, UNIT_THEME, UnitType} from "../constants/Constants";
@@ -83,7 +84,7 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
         }
 
         return (
-            <div className={`gameboard_field ${this.props.color} ${this.classSelected()}`} onClick={this.handleClick}>
+            <div className={`GameBoardField ${this.props.color} ${this.classSelected()}`} onClick={this.handleClick}>
                 {content}
             </div>
         )
