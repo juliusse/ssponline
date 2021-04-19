@@ -12,6 +12,7 @@ import {Point} from "../model/Point";
 import {AxiosError, AxiosResponse} from "axios";
 import {GameBoard} from "./GameBoard";
 import {GameLog} from "./GameLog";
+import {GameAction} from "../model/gameaction/GameAction";
 
 type Props = {
     team: Team
@@ -20,6 +21,8 @@ type Props = {
 
 type State = {
     gameState: GameStateModel
+    displayedUntilActionId: number | null,
+    shadowGameState: GameStateModel | null
     selectedField: Point | null
     setUpUnits: GameSetupState
 }
@@ -33,15 +36,19 @@ export type GameSetupState = {
 export class Game extends React.Component<Props, State> {
     readonly team: Team;
     readonly gameBoardAdapter: GameBoardAdapter;
+    readonly actions: Array<GameAction>;
 
     private intervalId: number | null = null;
 
     constructor(props: Props) {
         super(props);
         this.team = props.team;
+        this.actions = [];
         this.gameBoardAdapter = new GameBoardAdapter(props.gameId, this.team);
         this.state = {
             gameState: new GameStateModel(this.team),
+            displayedUntilActionId: null,
+            shadowGameState: null,
             selectedField: null,
             setUpUnits: {
                 trap1: null,
@@ -57,6 +64,7 @@ export class Game extends React.Component<Props, State> {
         this.handleAcceptClick = this.handleAcceptClick.bind(this);
         this.handleRestUnitsClick = this.handleRestUnitsClick.bind(this);
         this.handleAcceptSpecialUnitsClick = this.handleAcceptSpecialUnitsClick.bind(this);
+        this.handleHistoryActionClick = this.handleHistoryActionClick.bind(this);
     }
 
     componentDidMount() {
@@ -133,6 +141,26 @@ export class Game extends React.Component<Props, State> {
             });
     }
 
+    handleHistoryActionClick(actionId: number) {
+        if (this.state.gameState.lastProcessedAction == actionId) {
+            this.setState({
+                shadowGameState: null,
+                displayedUntilActionId: null
+            });
+            return;
+        }
+
+        const shadowGameState = new GameStateModel(this.team);
+        for (let i = 0; i < actionId; i++) {
+            shadowGameState.processAction(this.actions[i])
+        }
+
+        this.setState({
+            shadowGameState,
+            displayedUntilActionId: actionId
+        });
+    }
+
     processActions(response: AxiosResponse<GameActionsListResponse>) {
         const gameState = this.state.gameState.processActions(response.data.gameActions);
         this.setState({gameState});
@@ -144,6 +172,8 @@ export class Game extends React.Component<Props, State> {
         } else {
             this.stopCheck();
         }
+
+        response.data.gameActions.forEach((action) => this.actions.push(action));
     }
 
     processActionError(error: AxiosError) {
@@ -205,7 +235,8 @@ export class Game extends React.Component<Props, State> {
                                          onAcceptClick={this.handleAcceptSpecialUnitsClick}/>
                 </div>
                 <GameBoard team={this.team}
-                           gameState={this.state.gameState}
+                           gameState={this.state.shadowGameState ? this.state.shadowGameState : this.state.gameState}
+                           isShadowState={!!this.state.shadowGameState}
                            setUpUnits={this.state.setUpUnits}
                            onMoveUnit={this.handleMoveUnit}
                            onPlaceSpecialUnit={this.handlePlaceSpecialUnit}/>
@@ -213,7 +244,9 @@ export class Game extends React.Component<Props, State> {
                                    team={this.team}
                                    choice={this.state.gameState.fightChoice}
                                    onChooseUnit={this.handleFightUnitChosen}/>
-                <GameLog gameActions={this.state.gameState.actions}/>
+                <GameLog displayedUntilActionId={this.state.displayedUntilActionId}
+                         gameActions={this.state.gameState.actions}
+                         onActionClick={this.handleHistoryActionClick}/>
             </div>
         )
     }
