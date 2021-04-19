@@ -3,7 +3,7 @@ import {GameState, UnitType} from "../constants/Constants";
 import {isAdjacent} from "../utils/Utils";
 import {FightUnitSelector} from "./FightUnitSelector";
 import {GameStateModel} from "../model/GameStateModel";
-import {GameActionsResponse, GameBoardAdapter} from "../utils/GameBoardAdapter";
+import {GameActionsListResponse, GameBoardAdapter} from "../utils/GameBoardAdapter";
 import {GameStartOptions} from "./GameStartOptions";
 import {GameStartUnitSelect} from "./GameStartUnitSelect";
 import {Team} from "../model/Team";
@@ -116,7 +116,7 @@ export class Game extends React.Component<Props, State> {
             .then(this.processActions.bind(this));
     }
 
-    processActions(response: AxiosResponse<GameActionsResponse>) {
+    processActions(response: AxiosResponse<GameActionsListResponse>) {
         const gameState = this.state.gameState.processActions(response.data.gameActions);
         this.setState({gameState});
 
