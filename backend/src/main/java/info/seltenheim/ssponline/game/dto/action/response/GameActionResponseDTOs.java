@@ -74,6 +74,11 @@ public class GameActionResponseDTOs {
                     .setType(toUnitTypeDTO(chooseAction.getType(), chooseAction.getTeam(), requestingTeam, false));
         }
 
+        if (gameAction instanceof GameActionWin) {
+            gameActionResponseDTO = new GameActionResponseWinDTO()
+                    .setTeam(((GameActionWin) gameAction).getTeam());
+        }
+
         return gameActionResponseDTO
                 .setGameId(gameAction.getGameId())
                 .setTimestamp(gameAction.getCreatedDate())

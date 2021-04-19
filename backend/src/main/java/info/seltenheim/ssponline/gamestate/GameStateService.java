@@ -44,6 +44,9 @@ public class GameStateService {
             case FIGHT:
                 gameState = processFight((GameActionFight) action);
                 break;
+            case WIN:
+                gameState = processWin((GameActionWin) action);
+                break;
             case START:
             case FIGHT_CHOOSE_UNIT:
             default:
@@ -72,7 +75,7 @@ public class GameStateService {
     private GameState processAcceptUnits(GameActionAcceptUnits action) {
         final var gameState = gameRepository.findById(action.getGameId()).orElseThrow();
 
-        if(action.getTeam() == Team.RED) {
+        if (action.getTeam() == Team.RED) {
             gameState.setRedAcceptedUnits(true);
         } else {
             gameState.setBlueAcceptedUnits(true);
@@ -89,7 +92,7 @@ public class GameStateService {
                 .forEach(unit -> unitService.replaceUnitAtPosition(action.getGameId(), unit));
 
 
-        if(action.getTeam() == Team.RED) {
+        if (action.getTeam() == Team.RED) {
             gameState.setRedSetSpecialUnits(true);
         } else {
             gameState.setBlueSetSpecialUnits(true);
@@ -146,6 +149,13 @@ public class GameStateService {
         }
 
         return gameRepository.findById(action.getGameId()).orElseThrow();
+    }
+
+    private GameState processWin(GameActionWin action) {
+        final var gameState = gameRepository.findById(action.getGameId()).orElseThrow();
+
+        gameState.setGameState(info.seltenheim.ssponline.game.model.GameState.ENDED);
+        return gameState;
     }
 
     public Optional<Unit> findUnitInLocation(@NonNull String gameId, @NonNull Point location) {
