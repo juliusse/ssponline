@@ -148,7 +148,7 @@ export class Game extends React.Component<Props, State> {
         }
 
         const shadowGameState = new GameStateModel(this.team);
-        for (let i = 0; i < actionId; i++) {
+        for (let i = 0; i <= actionId; i++) {
             shadowGameState.processAction(this.state.gameState.actions[i])
         }
 
