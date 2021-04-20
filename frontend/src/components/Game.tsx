@@ -12,7 +12,6 @@ import {Point} from "../model/Point";
 import {AxiosError, AxiosResponse} from "axios";
 import {GameBoard} from "./GameBoard";
 import {GameLog} from "./GameLog";
-import {GameAction} from "../model/gameaction/GameAction";
 
 type Props = {
     team: Team
@@ -140,7 +139,7 @@ export class Game extends React.Component<Props, State> {
     }
 
     handleHistoryActionClick(actionId: number) {
-        if (this.state.gameState.lastProcessedAction == actionId) {
+        if (this.state.gameState.lastProcessedAction === actionId) {
             this.setState({
                 shadowGameState: null,
                 displayedUntilActionId: null
