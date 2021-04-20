@@ -14,14 +14,6 @@ type Props = {
 type State = {}
 
 export class GameLog extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        // this.handleClick = this.handleClick.bind(this);
-    }
-
-    // handleClick() {
-    //     this.props.onActionClick(element.arguments.actionId);
-    // }
 
     toLogLine(action: GameAction): JSX.Element {
         let content = null;
@@ -120,11 +112,11 @@ export class GameLog extends React.Component<Props, State> {
     }
 
     render() {
-        const entries = this
-            .props
-            .gameActions
-            .reverse()
-            .map(this.toLogLine.bind(this));
+        const actions = this.props.gameActions;
+        const entries = [];
+        for(let i = actions.length -1; i >= 0; i--) {
+            entries.push(this.toLogLine(actions[i]))
+        }
         return (
             <div className='GameLog'>
                 {entries}
