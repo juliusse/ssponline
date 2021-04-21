@@ -12,6 +12,7 @@ import {Point} from "../model/Point";
 import {AxiosError, AxiosResponse} from "axios";
 import {GameBoard} from "./GameBoard";
 import {GameLog} from "./GameLog";
+import {GameTurnInfo} from "./GameTurnInfo";
 
 type Props = {
     team: Team
@@ -229,6 +230,13 @@ export class Game extends React.Component<Props, State> {
                                          onResetClick={this.handleRestUnitsClick}
                                          onAcceptClick={this.handleAcceptSpecialUnitsClick}/>
                 </div>
+                <GameTurnInfo playerTeam={this.team}
+                              actions={this.state.gameState.actions}
+                              setUpUnits={this.state.setUpUnits}
+                              onShuffleClick={this.handleShuffleClick}
+                              onAcceptShuffleClick={this.handleAcceptClick}
+                              onResetSpecialUnitsClick={this.handleRestUnitsClick}
+                              onAcceptSpecialUnitsClick={this.handleAcceptSpecialUnitsClick}/>
                 <GameBoard team={this.team}
                            gameState={this.state.shadowGameState ? this.state.shadowGameState : this.state.gameState}
                            isShadowState={!!this.state.shadowGameState}
