@@ -5,8 +5,6 @@ import {isAdjacent} from "../utils/Utils";
 import {FightUnitSelector} from "./FightUnitSelector";
 import {GameStateModel} from "../model/GameStateModel";
 import {GameActionsListResponse, GameBoardAdapter} from "../utils/GameBoardAdapter";
-import {GameStartOptions} from "./GameStartOptions";
-import {GameStartUnitSelect} from "./GameStartUnitSelect";
 import {Team} from "../model/Team";
 import {Point} from "../model/Point";
 import {AxiosError, AxiosResponse} from "axios";
@@ -216,20 +214,8 @@ export class Game extends React.Component<Props, State> {
             return <div/>;
         }
 
-        const turnView = gameState.activeTeam != null ?
-            <span className={gameState.activeTeam.getName()}>{gameState.activeTeam.getName()}</span> : null;
-
         return (
             <div className="Game">
-                <div className="state">GameBoard | Turn: {turnView} |
-                    <GameStartOptions gameState={this.state.gameState}
-                                      onShuffleClick={this.handleShuffleClick}
-                                      onAcceptClick={this.handleAcceptClick}/>
-                    <GameStartUnitSelect gameState={this.state.gameState}
-                                         setUpUnits={this.state.setUpUnits}
-                                         onResetClick={this.handleRestUnitsClick}
-                                         onAcceptClick={this.handleAcceptSpecialUnitsClick}/>
-                </div>
                 <GameTurnInfo playerTeam={this.team}
                               actions={this.state.gameState.actions}
                               setUpUnits={this.state.setUpUnits}
