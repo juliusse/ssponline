@@ -86,9 +86,9 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
         const gameState = this.props.gameState;
         const unit = gameState.board![location.y][location.x];
 
-        if (unit !== null &&
-            unit.isMovable() &&
-            unit.isInTeam(this.team) &&
+        const fieldHasUnitInMyTeam = unit !== null && unit.isInTeam(this.team);
+        if (fieldHasUnitInMyTeam &&
+            unit!.isMovable() &&
             this.team === gameState.activeTeam) {
 
             this.setState({
@@ -98,7 +98,7 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
         }
 
         // clicking on neigbouring field
-        if (this.isAdjacentToSelectedField(location)) {
+        if (!fieldHasUnitInMyTeam && this.isAdjacentToSelectedField(location)) {
             this.props.onMoveUnit(this.state.selectedField!, location);
         }
 
