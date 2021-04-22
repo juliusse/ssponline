@@ -37,7 +37,7 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
         return this.props.state.board![this.location.y][this.location.x];
     }
 
-    isMyTeamsTurn() {
+    isUnitsTeamTurn() {
         const unit = this.getUnit();
         return unit != null && unit.team === this.props.state.activeTeam;
     }
@@ -51,13 +51,29 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
         return fightLocation.isEqual(this.location);
     }
 
-    classSelected() {
+    classSelected(): string {
         const selectedField = this.props.selectedField;
         return this.location.isEqual(selectedField) ? 'selected' : '';
     }
 
+    isClickable(): boolean {
+        const gameState = this.props.state.gameState;
+        const playerTeam = this.props.state.playerTeam;
+        const unit = this.getUnit();
+        if (gameState === GameState.SETUP ||
+            (gameState === GameState.TURN &&
+                unit?.team === playerTeam &&
+                unit.isMovable() &&
+                this.isUnitsTeamTurn())) {
+            return true;
+        }
+
+        return false;
+    }
+
     render() {
         const unit = this.getUnit();
+        let isClickable = this.isClickable();
         let content = <Unit model={unit} isActive={false} onClick={null}/>;
 
         if (this.props.state.gameState === GameState.SETUP) {
@@ -98,16 +114,20 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
             content = <img alt='fight' src={`/assets/img/${UNIT_THEME}/kampf.gif`}/>
         }
 
-        if (!this.isMyTeamsTurn() && this.props.selectedField != null) {
+        if (!this.isUnitsTeamTurn() && this.props.selectedField != null) {
             const selectedField = this.props.selectedField;
             const direction = isAdjacent(selectedField, this.props.location);
+
             if (direction != null) {
+                isClickable = true;
                 content = <img alt="direction" src={direction.src}/>
             }
         }
 
+        const isClickableClass = isClickable ? 'clickable' : '';
+        const classes = `GameBoardField ${this.props.color} ${this.classSelected()} ${isClickableClass}`;
         return (
-            <div className={`GameBoardField ${this.props.color} ${this.classSelected()}`} onClick={this.handleClick}>
+            <div className={classes} onClick={this.handleClick}>
                 {content}
             </div>
         )
