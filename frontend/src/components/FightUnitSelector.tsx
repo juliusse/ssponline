@@ -26,20 +26,29 @@ export class FightUnitSelector extends React.Component<Props, State> {
 
     render() {
         if (this.props.gameState !== GameState.FIGHT) {
-            return <div className="FightUnitSelector" />;
+            return <div className="FightUnitSelector"/>;
         }
 
         return (
             <div className="FightUnitSelector">
-                <Unit isActive={this.props.choice === UnitType.ROCK}
-                      onClick={this.handleClick}
-                      model={new UnitModel(this.props.team, UnitType.ROCK, false)}/>
-                <Unit isActive={this.props.choice === UnitType.PAPER}
-                      onClick={this.handleClick}
-                      model={new UnitModel(this.props.team, UnitType.PAPER, false)}/>
-                <Unit isActive={this.props.choice === UnitType.SCISSORS}
-                      onClick={this.handleClick}
-                      model={new UnitModel(this.props.team, UnitType.SCISSORS, false)}/>
+                <div className='title'>Select a Unit!</div>
+                <div className='units'>
+                    <div>
+                        <Unit isActive={this.props.choice === UnitType.ROCK}
+                              onClick={this.handleClick}
+                              model={new UnitModel(this.props.team, UnitType.ROCK, false)}/>
+                    </div>
+                    <div>
+                        <Unit isActive={this.props.choice === UnitType.PAPER}
+                              onClick={this.handleClick}
+                              model={new UnitModel(this.props.team, UnitType.PAPER, false)}/>
+                    </div>
+                    <div>
+                        <Unit isActive={this.props.choice === UnitType.SCISSORS}
+                              onClick={this.handleClick}
+                              model={new UnitModel(this.props.team, UnitType.SCISSORS, false)}/>
+                    </div>
+                </div>
             </div>
         );
     }
