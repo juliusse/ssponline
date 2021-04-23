@@ -7,6 +7,9 @@ services:
       - "80"
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - ./certs/api.beta.ssponline.de:/etc/nginx/certs
     depends_on:
       - beta-backend
       - beta-frontend
@@ -22,7 +25,7 @@ services:
   beta-frontend:
     image: juliusse/ssponline-frontend:${IMAGE_TAG:-latest}
     environment:
-      REACT_APP_URL: "http://api.beta.ssponline.de"
+      REACT_APP_URL: "https://api.beta.ssponline.de"
     expose:
       - "5000"
     depends_on:
