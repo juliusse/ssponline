@@ -15,15 +15,17 @@ export type GameActionsListResponse = {
 export class GameBoardAdapter {
     readonly gameId: string;
     readonly requestingTeam: Team;
+    readonly backendUrl: string;
 
     constructor(gameId: string, requestingTeam: Team) {
         this.gameId = gameId;
         this.requestingTeam = requestingTeam;
+        this.backendUrl = AppConfig.backendUrl();
     }
 
     getActionsAsync(fromIndex = 0): AxiosPromise<GameActionsListResponse> {
         return axios({
-            url: AppConfig.backendUrl + `/game/${this.gameId}`,
+            url: this.backendUrl + `/game/${this.gameId}`,
             transformResponse: this.toGameAction,
             params: {
                 requestingPlayer: this.requestingTeam.getApi(),
@@ -68,7 +70,7 @@ export class GameBoardAdapter {
     sendAction(data: any, fromIndex: number): AxiosPromise<GameActionsListResponse> {
         return axios({
             method: 'post',
-            url: AppConfig.backendUrl + `/game/${this.gameId}/action`,
+            url: this.backendUrl + `/game/${this.gameId}/action`,
             transformResponse: this.toGameAction,
             data,
             params: {

@@ -9,7 +9,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./certs:/etc/nginx/certs
+      - ../certs:/etc/nginx/certs
     depends_on:
       - beta-backend
       - beta-frontend
@@ -24,9 +24,9 @@ services:
 
   beta-frontend:
     image: juliusse/ssponline-frontend:${IMAGE_TAG:-latest}
-    environment:
-      REACT_APP_URL: "https://api.beta.ssponline.de"
     expose:
       - "5000"
+    volumes:
+      - ./beta.frontend.config.js:/app/build/config.js
     depends_on:
       - beta-backend
