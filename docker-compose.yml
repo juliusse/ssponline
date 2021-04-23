@@ -9,7 +9,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./certs/api.beta.ssponline.de:/etc/nginx/certs
+      - ./certs:/etc/nginx/certs
     depends_on:
       - beta-backend
       - beta-frontend
