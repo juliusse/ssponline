@@ -1,7 +1,16 @@
 version: "3"
 
 services:
-  backend:
+  nginx:
+    image: juliusse/ssponline-nginx:${IMAGE_TAG:-latest}
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    depends_on:
+      - beta-backend
+      - beta-frontend
+  beta-backend:
     image: juliusse/ssponline-backend:${IMAGE_TAG:-latest}
     deploy:
       resources:
@@ -9,16 +18,12 @@ services:
           memory: 2000M
     expose:
       - "8081"
-    ports:
-      - "8081:8081"
 
-  frontend:
+  beta-frontend:
     image: juliusse/ssponline-frontend:${IMAGE_TAG:-latest}
     environment:
-      REACT_APP_URL: "http://192.168.178.90"
+      REACT_APP_URL: "http://api.beta.ssponline.de"
     expose:
       - "5000"
-    ports:
-      - "80:5000"
     depends_on:
-      - backend
+      - beta-backend
