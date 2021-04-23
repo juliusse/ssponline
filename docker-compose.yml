@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  backend:
+    image: juliusse/ssponline-backend:${IMAGE_TAG:-latest}
+    deploy:
+      resources:
+        limits:
+          memory: 2000M
+    expose:
+      - "8081"
+    ports:
+      - "8081:8081"
+
+  frontend:
+    image: juliusse/ssponline-frontend:${IMAGE_TAG:-latest}
+    environment:
+      REACT_APP_URL: "http://192.168.178.90"
+    expose:
+      - "5000"
+    ports:
+      - "80:5000"
+    depends_on:
+      - backend

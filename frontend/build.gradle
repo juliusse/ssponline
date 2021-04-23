@@ -11,5 +11,5 @@ version = '0.0.1-SNAPSHOT'
 task buildImage(type: DockerBuildImage) {
     inputDir = file('./')
     buildArgs = ['APP_URL':'http://beta.ssponline.de:8081']
-    images.add('docker.pkg.github.com/juliusse/ssponline/frontend:latest')
+    images.add('juliusse/ssponline-frontend:latest')
 }
