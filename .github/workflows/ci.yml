@@ -102,6 +102,6 @@ jobs:
       - name: Add ssh key
         run: echo "${{ secrets.AWS_SSH_KEY}}" >> ~/ssh_key && chmod 600 ~/ssh_key
       - name: Update docker-compose.yml on server
-        run: scp -o StrictHostKeyChecking=no -i ~/ssh_key docker-compose.yml ec2-user@18.156.4.123:/home/ec2-user
+        run: scp -o StrictHostKeyChecking=no -pr -i ~/ssh_key deployment ec2-user@18.156.4.123:/home/ec2-user/
       - name: Update Deployment
-        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ec2-user@18.156.4.123 "docker-compose pull && docker-compose -p ssponline up -d"
+        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ec2-user@18.156.4.123 "cd deployment && docker-compose pull && docker-compose -p ssponline up -d"
