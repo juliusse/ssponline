@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Builds image
-        run: docker build --build-arg APP_URL="http://api.beta.ssponline.de" --tag juliusse/ssponline-frontend:latest ./frontend
+        run: docker build --build-arg APP_URL="https://api.beta.ssponline.de" --tag juliusse/ssponline-frontend:latest ./frontend
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -104,4 +104,4 @@ jobs:
       - name: Update docker-compose.yml on server
         run: scp -o StrictHostKeyChecking=no -i ~/ssh_key docker-compose.yml ec2-user@18.156.4.123:/home/ec2-user
       - name: Update Deployment
-        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ec2-user@18.156.4.123 "docker-compose -p ssponline up -d"
+        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ec2-user@18.156.4.123 "docker-compose pull && docker-compose -p ssponline up -d"
