@@ -27,10 +27,12 @@ Now I am using the game as a playground to test out technologies.
 - Infrastructure:
   - git / GitHub
   - GitHub Actions
-  - GutHub Registry
+  - DockerHub Registry
   - Docker
+  - docker-compose
+  - nginx
+  - LetsEncrypt certificate
   - AWS EC2
-
 
 ## Playable Demo
 You can see the current state at http://beta.ssponline.de 
