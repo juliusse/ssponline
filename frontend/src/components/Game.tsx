@@ -1,7 +1,6 @@
 import React from 'react';
 import './Game.sass';
 import {GameState, UnitType} from "../constants/Constants";
-import {isAdjacent} from "../utils/Utils";
 import {FightUnitSelector} from "./FightUnitSelector";
 import {GameStateModel} from "../model/GameStateModel";
 import {GameActionsListResponse, GameBoardAdapter} from "../utils/GameBoardAdapter";
@@ -11,6 +10,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import {GameBoard} from "./GameBoard";
 import {GameLog} from "./GameLog";
 import {GameTurnInfo} from "./GameTurnInfo";
+import {isAdjacent} from "../utils/LocationUtils";
 
 type Props = {
     team: Team

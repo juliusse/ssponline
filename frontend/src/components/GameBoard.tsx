@@ -2,11 +2,11 @@ import React from 'react';
 import './GameBoard.sass';
 import {GameBoardField} from "./GameBoardField";
 import {GameState, UnitType} from "../constants/Constants";
-import {isAdjacent} from "../utils/Utils";
 import {GameStateModel} from "../model/GameStateModel";
 import {Team} from "../model/Team";
 import {Point} from "../model/Point";
 import {GameSetupState} from "./Game";
+import {isAdjacent} from "../utils/LocationUtils";
 
 type GameBoardProps = {
     team: Team;
@@ -125,10 +125,13 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
                 <div className='gameboard_column_number'><span>7</span></div>
             </div>
         )
-        for (let y = 0; y < 6; y++) {
+        const displayInverted = this.props.team === Team.RED;
+        for (let i = 0; i < 6; i++) {
+            const y = displayInverted ? 5 - i : i;
             const row = [];
             row.push(<div className="gameboard_row_number" key={`row-number-${y + 1}`}><span>{y + 1}</span></div>)
-            for (let x = 0; x < 7; x++) {
+            for (let j = 0; j < 7; j++) {
+                const x = displayInverted ? 6 - j : j;
                 const color = (x + y) % 2 === 0 ? "green" : "white";
                 row.push(<GameBoardField
                     state={gameState}
@@ -138,6 +141,7 @@ export class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
                     location={new Point(x, y)}
                     color={color}
                     onClick={this.handleFieldClick}
+                    displayInverted={displayInverted}
                 />);
             }
 
