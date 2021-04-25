@@ -20,17 +20,9 @@ export enum UnitType {
     HIDDEN = 'HIDDEN',
 }
 
-export const Direction = {
-    UP: {
-        src: `/assets/img/${UNIT_THEME}/pfeil_o.gif`
-    },
-    DOWN: {
-        src: `/assets/img/${UNIT_THEME}/pfeil_u.gif`
-    },
-    LEFT: {
-        src: `/assets/img/${UNIT_THEME}/pfeil_l.gif`
-    },
-    RIGHT: {
-        src: `/assets/img/${UNIT_THEME}/pfeil_r.gif`
-    },
+export enum Direction {
+    UP = 'UP',
+    DOWN = 'DOWN',
+    RIGHT = 'RIGHT',
+    LEFT = 'LEFT'
 }

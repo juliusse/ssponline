@@ -1,13 +1,13 @@
 import React from 'react';
 import './GameBoardField.sass';
-import {isAdjacent} from "../utils/Utils";
 import {Unit} from "./Unit";
-import {Direction, GameState, UNIT_THEME, UnitType} from "../constants/Constants";
+import {GameState, UNIT_THEME, UnitType} from "../constants/Constants";
 import {Point} from "../model/Point";
 import {GameStateModel} from "../model/GameStateModel";
 import {UnitModel} from "../model/UnitModel";
 import {GameSetupState} from "./Game";
 import {GameActionType} from "../model/gameaction/GameActionType";
+import {directionToImg, invertDirection, isAdjacent} from "../utils/LocationUtils";
 
 type GameBoardFieldProps = {
     state: GameStateModel;
@@ -15,6 +15,7 @@ type GameBoardFieldProps = {
     selectedField: Point | null;
     location: Point;
     color: string;
+    displayInverted: boolean;
     onClick: Function;
 }
 
@@ -93,20 +94,8 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
             const adjacentDirection = isAdjacent(lastAction.to!, this.location);
 
             if (this.location.isEqual(lastAction.from!) && adjacentDirection) {
-                switch (adjacentDirection) {
-                    case Direction.RIGHT:
-                        content = <img alt="direction" src={Direction.LEFT.src}/>
-                        break;
-                    case Direction.LEFT:
-                        content = <img alt="direction" src={Direction.RIGHT.src}/>
-                        break;
-                    case Direction.UP:
-                        content = <img alt="direction" src={Direction.DOWN.src}/>
-                        break;
-                    case Direction.DOWN:
-                        content = <img alt="direction" src={Direction.UP.src}/>
-                        break;
-                }
+                const direction = this.props.displayInverted ? adjacentDirection : invertDirection(adjacentDirection);
+                content = directionToImg(direction);
             }
         }
 
@@ -119,8 +108,9 @@ export class GameBoardField extends React.Component<GameBoardFieldProps, GameBoa
             const direction = isAdjacent(selectedField, this.props.location);
 
             if (direction != null) {
+                const displayedDirection = this.props.displayInverted ? invertDirection(direction) : direction;
                 isClickable = true;
-                content = <img alt="direction" src={direction.src}/>
+                content = directionToImg(displayedDirection);
             }
         }
 
