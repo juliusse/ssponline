@@ -1,5 +1,6 @@
 package info.seltenheim.ssponline.gamestate.model;
 
+import info.seltenheim.ssponline.DbModel;
 import info.seltenheim.ssponline.game.model.Team;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "game_state_game")
-public class GameState {
+public class GameState extends DbModel {
     @Id
     @Column(name = "id")
     private String id;

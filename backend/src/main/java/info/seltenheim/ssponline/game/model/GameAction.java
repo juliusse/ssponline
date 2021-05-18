@@ -1,5 +1,6 @@
 package info.seltenheim.ssponline.game.model;
 
+import info.seltenheim.ssponline.DbModel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.io.Serializable;
 @EntityListeners(AuditingEntityListener.class)
 @IdClass(GameAction.IdClass.class)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class GameAction {
+public class GameAction extends DbModel {
     @Id
     @Column(name = "game_id")
     private String gameId;

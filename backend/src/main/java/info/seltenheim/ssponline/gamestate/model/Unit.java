@@ -1,5 +1,6 @@
 package info.seltenheim.ssponline.gamestate.model;
 
+import info.seltenheim.ssponline.DbModel;
 import info.seltenheim.ssponline.game.model.Point;
 import info.seltenheim.ssponline.game.model.Team;
 import info.seltenheim.ssponline.game.model.UnitType;
@@ -14,7 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "game_state_unit")
-public class Unit implements Serializable {
+public class Unit extends DbModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
