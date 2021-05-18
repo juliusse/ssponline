@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface GameActionRepository extends JpaRepository<GameAction, String> {
+public interface GameActionRepository extends JpaRepository<GameAction, GameAction.IdClass> {
 
     GameAction findFirstByGameIdOrderByActionIdDesc(String gameId);
 

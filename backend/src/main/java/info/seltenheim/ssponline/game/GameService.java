@@ -34,8 +34,8 @@ public class GameService {
                 .orElseGet(() -> createNewGame(id));
     }
 
-    public List<GameAction> getGameActions(@NonNull String id, @NonNull int fromIndex) {
-        return gameActionRepository.findAllByGameIdOrderByActionIdAsc(id, new OffsetLimitPageable(fromIndex, 10000));
+    public List<GameAction> getGameActions(@NonNull String gameId, int fromIndex) {
+        return gameActionRepository.findAllByGameIdOrderByActionIdAsc(gameId, new OffsetLimitPageable(fromIndex, 10000));
     }
 
     public Game createNewGame(@NonNull String id) {
