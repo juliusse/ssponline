@@ -19,9 +19,11 @@ public class GameActionUnit {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "game_action_id", nullable = false)
-    private GameAction gameActionId;
+    @Column(name = "game_id")
+    private String gameId;
+
+    @Column(name = "action_id")
+    private long actionId;
 
     @Column(name = "x")
     private int x;
@@ -44,8 +46,9 @@ public class GameActionUnit {
         return new Point(x, y);
     }
 
-    public GameActionUnit(GameAction gameActionId, int x, int y, Team team, UnitType type, boolean isVisible) {
-        this.gameActionId = gameActionId;
+    public GameActionUnit(GameAction gameAction, int x, int y, Team team, UnitType type, boolean isVisible) {
+        this.gameId = gameAction.getGameId();
+        this.actionId = gameAction.getActionId();
         this.x = x;
         this.y = y;
         this.team = team;

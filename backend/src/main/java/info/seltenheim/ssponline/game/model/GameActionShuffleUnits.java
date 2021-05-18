@@ -16,7 +16,11 @@ public class GameActionShuffleUnits extends GameAction {
     @Enumerated(EnumType.ORDINAL)
     private Team team;
 
-    @OneToMany(mappedBy = "gameActionId")
+    @OneToMany
+    @JoinColumns({
+            @JoinColumn(name = "game_id", referencedColumnName = "game_id"),
+            @JoinColumn(name = "action_id", referencedColumnName = "action_id")
+    })
     private List<GameActionUnit> units;
 
     public GameActionShuffleUnits(String gameId, Long actionId, Team team) {
