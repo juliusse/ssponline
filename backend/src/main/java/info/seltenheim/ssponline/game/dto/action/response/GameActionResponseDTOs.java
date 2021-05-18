@@ -81,7 +81,7 @@ public class GameActionResponseDTOs {
 
         return gameActionResponseDTO
                 .setGameId(gameAction.getGameId())
-                .setTimestamp(gameAction.getCreatedDate())
+                .setTimestamp(gameAction.getCreatedAt())
                 .setActionId(gameAction.getActionId())
                 .setActionType(gameAction.getActionType())
                 .setActiveTeam(gameAction.getActiveTeam())

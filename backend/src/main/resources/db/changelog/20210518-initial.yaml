@@ -1,0 +1,321 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20210518-initial
+      author: j.seltenheim
+      changes:
+        - createTable:
+            tableName: game
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: id
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: modified_at
+                  type: bigint
+        - addPrimaryKey:
+            clustered: true
+            columnNames: id
+            constraintName: pk_game
+            tableName: game
+
+        - createTable:
+            tableName: game_action
+            columns:
+              # base table
+              - column:
+                  constraints:
+                    nullable: false
+                  name: game_id
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: action_id
+                  type: int
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: modified_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: action_type
+                  type: varchar
+              - column:
+                  name: active_team
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: game_state
+                  type: varchar
+              # sub tables
+              - column:
+                  name: team
+                  type: varchar
+              # move
+              - column:
+                  name: unit_type
+                  type: varchar
+              - column:
+                  name: visible
+                  type: boolean
+              - column:
+                  name: from_x
+                  type: int
+              - column:
+                  name: from_y
+                  type: int
+              - column:
+                  name: to_x
+                  type: int
+              - column:
+                  name: to_y
+                  type: int
+              # fight
+              - column:
+                  name: location_x
+                  type: int
+              - column:
+                  name: location_y
+                  type: int
+              - column:
+                  name: unit_type_red
+                  type: varchar
+              - column:
+                  name: unit_type_blue
+                  type: varchar
+              - column:
+                  name: winning_team
+                  type: varchar
+        - addPrimaryKey:
+            clustered: true
+            columnNames: game_id, action_id
+            constraintName: pk_game_action
+            tableName: game_action
+        - addForeignKeyConstraint:
+            baseColumnNames: game_id
+            baseTableName: game_action
+            constraintName: fk_game_action_game
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: game
+
+        - createTable:
+            tableName: game_action_unit
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: id
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: game_id
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: action_id
+                  type: int
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: modified_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: x
+                  type: int
+              - column:
+                  constraints:
+                    nullable: false
+                  name: y
+                  type: int
+              - column:
+                  constraints:
+                    nullable: false
+                  name: team
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: visible
+                  type: boolean
+        - addPrimaryKey:
+            clustered: true
+            columnNames: id
+            constraintName: pk_game_action_unit
+            tableName: game_action_unit
+        - addAutoIncrement:
+            tableName: game_action_unit
+            columnDataType: bigint
+            columnName: id
+        - addForeignKeyConstraint:
+            baseColumnNames: game_id, action_id
+            baseTableName: game_action_unit
+            constraintName: fk_game_action_unit_game_action
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: game_id, action_id
+            referencedTableName: game_action
+
+
+        - createTable:
+            tableName: game_state_game
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: id
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: modified_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_action_id
+                  type: int
+              - column:
+                  name: active_team
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: game_state
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: accepted_units_red
+                  type: boolean
+              - column:
+                  constraints:
+                    nullable: false
+                  name: accepted_units_blue
+                  type: boolean
+              - column:
+                  constraints:
+                    nullable: false
+                  name: special_units_red
+                  type: boolean
+              - column:
+                  constraints:
+                    nullable: false
+                  name: special_units_blue
+                  type: boolean
+        - addPrimaryKey:
+            clustered: true
+            columnNames: id
+            constraintName: pk_game_state_game
+            tableName: game_state_game
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: game_state_game
+            constraintName: fk_game_state_game__game
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: game
+
+        - createTable:
+            tableName: game_state_unit
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: id
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: game_id
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: modified_at
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: team
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type
+                  type: varchar
+              - column:
+                  constraints:
+                    nullable: false
+                  name: x
+                  type: int
+              - column:
+                  constraints:
+                    nullable: false
+                  name: y
+                  type: int
+              - column:
+                  constraints:
+                    nullable: false
+                  name: visible
+                  type: boolean
+        - addPrimaryKey:
+            clustered: true
+            columnNames: id
+            constraintName: pk_game_state_unit
+            tableName: game_state_unit
+        - addAutoIncrement:
+            tableName: game_state_unit
+            columnDataType: bigint
+            columnName: id
+        - addForeignKeyConstraint:
+            baseColumnNames: game_id
+            baseTableName: game_state_unit
+            constraintName: fk_game_state_unit__game_state_game
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: game_state_game

@@ -11,9 +11,10 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
+@DiscriminatorValue("SET_SPECIAL_UNITS")
 public class GameActionSetSpecialUnits extends GameAction {
     @Column(name = "team")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Team team;
 
     @OneToMany
@@ -23,7 +24,7 @@ public class GameActionSetSpecialUnits extends GameAction {
     })
     private List<GameActionUnit> units;
 
-    public GameActionSetSpecialUnits(String gameId, Long actionId, Team team) {
+    public GameActionSetSpecialUnits(String gameId, int actionId, Team team) {
         super(gameId, actionId, GameActionType.SET_SPECIAL_UNITS, null, GameState.SETUP);
         this.team = team;
     }

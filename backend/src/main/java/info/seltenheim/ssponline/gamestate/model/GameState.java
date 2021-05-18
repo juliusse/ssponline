@@ -17,14 +17,14 @@ public class GameState extends DbModel {
     private String id;
 
     @Column(name = "last_action_id")
-    private long lastActionId;
+    private int lastActionId;
 
     @Column(name = "active_team")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Team activeTeam;
 
     @Column(name = "game_state")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private info.seltenheim.ssponline.game.model.GameState gameState;
 
     @Column(name = "accepted_units_red")

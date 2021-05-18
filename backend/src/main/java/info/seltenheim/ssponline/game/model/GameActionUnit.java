@@ -24,7 +24,7 @@ public class GameActionUnit extends DbModel {
     private String gameId;
 
     @Column(name = "action_id")
-    private long actionId;
+    private int actionId;
 
     @Column(name = "x")
     private int x;
@@ -33,11 +33,11 @@ public class GameActionUnit extends DbModel {
     private int y;
 
     @Column(name = "team")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Team team;
 
     @Column(name = "type")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private UnitType type;
 
     @Column(name = "visible")

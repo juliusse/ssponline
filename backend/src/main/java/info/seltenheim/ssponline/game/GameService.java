@@ -43,7 +43,7 @@ public class GameService {
 
 
         final var game = gameRepository.save(new Game(id));
-        final var actionConfigure = gameActionRepository.save(new GameActionConfigure(id, 0L));
+        final var actionConfigure = gameActionRepository.save(new GameActionConfigure(id, 0));
         gameStateService.processAction(actionConfigure);
 
         final var redShuffle =
@@ -214,7 +214,7 @@ public class GameService {
         fight(gameId, lastAction.getActionId() + 2, action.getActiveTeam(), fightAction.getLocation(), redType, blueType);
     }
 
-    private void fight(String gameId, long actionId, Team activeTeam, Point location, UnitType redType, UnitType blueType) {
+    private void fight(String gameId, int actionId, Team activeTeam, Point location, UnitType redType, UnitType blueType) {
         final var winner = fight(redType, blueType);
 
         if (winner == FightResult.TIE) {
@@ -252,7 +252,7 @@ public class GameService {
         }
     }
 
-    private void finishGame(String gameId, long lastActionId, Team winningTeam) {
+    private void finishGame(String gameId, int lastActionId, Team winningTeam) {
         final var action = new GameActionWin(gameId, lastActionId + 1, winningTeam);
         gameActionRepository.save(action);
         gameStateService.processAction(action);

@@ -4,15 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
+@DiscriminatorValue("FIGHT")
 public class GameActionFight extends GameAction {
 
     @Column(name = "location_x")
@@ -21,22 +19,22 @@ public class GameActionFight extends GameAction {
     private int y;
 
     @Column(name = "unit_type_red")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private UnitType redType;
 
     @Column(name = "unit_type_blue")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private UnitType blueType;
 
     @Column(name = "winning_team")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Team winningTeam;
 
     public Point getLocation() {
         return new Point(x, y);
     }
 
-    public GameActionFight(String gameId, Long actionId, Team newActiveTeam, GameState gameState,
+    public GameActionFight(String gameId, int actionId, Team newActiveTeam, GameState gameState,
                            Point location, UnitType redType, UnitType blueType, Team winningTeam) {
         super(gameId, actionId, GameActionType.FIGHT, newActiveTeam, gameState);
         this.x = location.getX();

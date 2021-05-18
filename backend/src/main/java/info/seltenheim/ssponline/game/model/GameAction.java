@@ -18,6 +18,7 @@ import java.io.Serializable;
 @EntityListeners(AuditingEntityListener.class)
 @IdClass(GameAction.IdClass.class)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="action_type", discriminatorType = DiscriminatorType.STRING)
 public class GameAction extends DbModel {
     @Id
     @Column(name = "game_id")
@@ -25,25 +26,21 @@ public class GameAction extends DbModel {
 
     @Id
     @Column(name = "action_id")
-    private long actionId;
+    private int actionId;
 
-    @Column(name = "created_date")
-    @CreatedDate
-    private long createdDate;
-
-    @Column(name = "action_type")
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "action_type", insertable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
     private GameActionType actionType;
 
     @Column(name = "active_team")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Team activeTeam;
 
     @Column(name = "game_state")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private GameState gameState;
 
-    public GameAction(String gameId, Long actionId, GameActionType actionType, Team activeTeam, GameState gameState) {
+    public GameAction(String gameId, int actionId, GameActionType actionType, Team activeTeam, GameState gameState) {
         this.gameId = gameId;
         this.actionId = actionId;
         this.actionType = actionType;
@@ -54,6 +51,6 @@ public class GameAction extends DbModel {
     @Data
     public static class IdClass implements Serializable {
         private String gameId;
-        private Long actionId;
+        private int actionId;
     }
 }
