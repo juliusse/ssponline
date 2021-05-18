@@ -25,11 +25,11 @@ public class Unit extends DbModel implements Serializable {
     private String gameId;
 
     @Column(name = "team")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Team team;
 
     @Column(name = "type")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private UnitType type;
 
     @Column(name = "location")

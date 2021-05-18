@@ -4,21 +4,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
+@DiscriminatorValue("ACCEPT_UNITS")
 public class GameActionAcceptUnits extends GameAction {
     @Column(name = "team")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Team team;
 
-    public GameActionAcceptUnits(String gameId, Long actionId, Team team) {
+    public GameActionAcceptUnits(String gameId, int actionId, Team team) {
         super(gameId, actionId, GameActionType.ACCEPT_UNITS, null, GameState.SETUP);
         this.team = team;
     }

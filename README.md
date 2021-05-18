@@ -16,7 +16,8 @@ Now I am using the game as a playground to test out technologies.
     - Web, JPA, Retry, Security
     - other modules will come (e.g. actuator, sleuth)
   - H2 in-memory-db
-    - will be replaced by postgres with liquibase
+    - will be replaced by postgres
+  - Liquibase
   - Lombok
   - Gradle
 - Frontend:

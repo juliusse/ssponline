@@ -59,7 +59,7 @@ public class GameStateService {
 
     private GameState processConfigure(GameActionConfigure gameActionConfigure) {
         final var gameState = new GameState(gameActionConfigure.getGameId());
-        return gameRepository.save(gameState);
+        return gameState;
     }
 
     private GameState processShuffleUnits(GameActionShuffleUnits action) {
