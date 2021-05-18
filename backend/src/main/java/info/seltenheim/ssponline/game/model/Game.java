@@ -1,5 +1,6 @@
 package info.seltenheim.ssponline.game.model;
 
+import info.seltenheim.ssponline.DbModel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Entity(name = "game")
-public class Game {
+public class Game extends DbModel {
     @Id
     @Column(name = "id")
     private String id = UUID.randomUUID().toString();

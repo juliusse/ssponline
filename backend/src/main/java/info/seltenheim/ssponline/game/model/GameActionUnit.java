@@ -1,5 +1,6 @@
 package info.seltenheim.ssponline.game.model;
 
+import info.seltenheim.ssponline.DbModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "game_action_unit")
-public class GameActionUnit {
+public class GameActionUnit extends DbModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
