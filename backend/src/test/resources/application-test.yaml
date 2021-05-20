@@ -1,0 +1,5 @@
+ssponline:
+  mail:
+    mailJetApiKey: someKey
+    mailJetApiSecret: someSecret
+    fromEmailAddress: someEmail

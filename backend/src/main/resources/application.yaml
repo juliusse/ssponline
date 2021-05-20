@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    include: secrets
   liquibase:
     enabled: true
   datasource:
