@@ -40,6 +40,8 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - name: Decrypt secret values
+        run: echo ${{ secrets.ANSIBLE_SECRET }} > ./password.txt && ansible-vault view --vault-password-file password.txt backend/src/main/resources/application-secrets.yaml.encrypted > backend/src/main/resources/application-secrets.yaml
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build Image
