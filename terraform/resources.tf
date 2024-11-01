@@ -84,6 +84,24 @@ resource "aws_security_group" "security" {
     protocol  = "tcp"
   }
 
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -100,7 +118,6 @@ resource "aws_instance" "server" {
   ami        = data.aws_ami.amazon_linux_2.id
   instance_type = "t2.micro"
   key_name = aws_key_pair.aws_server_key.key_name
-  associate_public_ip_address = true
   security_groups             = [aws_security_group.security.id]
 
   subnet_id = aws_subnet.public_subnets[0].id
@@ -135,6 +152,11 @@ resource "aws_instance" "server" {
   }
 }
 
+resource "aws_eip" "lb" {
+  instance = aws_instance.server.id
+  domain   = "vpc"
+}
+
 resource "github_actions_secret" "ssponline_aws_ssh_key" {
   repository       = "ssponline"
   secret_name      = "AWS_SSH_KEY"
@@ -144,7 +166,7 @@ resource "github_actions_secret" "ssponline_aws_ssh_key" {
 resource "github_actions_secret" "ssponline_aws_ssh_ip" {
   repository       = "ssponline"
   secret_name      = "AWS_SSH_IP"
-  plaintext_value = aws_instance.server.public_ip
+  plaintext_value = aws_eip.lb.public_ip
 }
 
 resource "github_actions_secret" "ssponline_aws_ssh_user" {
