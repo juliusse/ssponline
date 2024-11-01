@@ -9,3 +9,4 @@ application-secrets.yaml
 .terraform.lock.hcl
 .DS_Store
 *.tfstate*
+.tfvars

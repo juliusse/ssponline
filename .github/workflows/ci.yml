@@ -105,8 +105,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Add ssh key
-        run: echo "${{ secrets.AWS_SSH_KEY}}" >> ~/ssh_key && chmod 600 ~/ssh_key
+        run: echo "${{ secrets.AWS_SSH_KEY }}" >> ~/ssh_key && chmod 600 ~/ssh_key
       - name: Update docker-compose.yml on server
-        run: scp -o StrictHostKeyChecking=no -pr -i ~/ssh_key deployment ec2-user@18.156.4.123:/home/ec2-user/
+        run: scp -o StrictHostKeyChecking=no -pr -i ~/ssh_key deployment ${{ secrets.AWS_SSH_USER_NAME }}@${{ secrets.AWS_SSH_IP }}:${{ secrets.AWS_SSH_USER_HOME }}
       - name: Update Deployment
-        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ec2-user@18.156.4.123 "cd deployment && docker-compose pull && docker-compose -p ssponline up -d"
+        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ${{ secrets.AWS_SSH_USER_NAME }}@${{ secrets.AWS_SSH_IP }} "cd ${{ secrets.AWS_SSH_USER_HOME }}/deployment && sudo docker-compose pull && sudo docker-compose -p ssponline up -d"
