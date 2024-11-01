@@ -19,4 +19,4 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plug
 
 # start application
 cd /home/ubuntu/deployment
-sudo docker compose up -d
+sudo docker compose -p ssponline up -d

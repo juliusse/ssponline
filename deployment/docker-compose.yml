@@ -1,14 +1,13 @@
-version: "3"
-
 services:
   nginx:
-    image: juliusse/ssponline-nginx:${IMAGE_TAG:-latest}
+    image: nginx:1.27-alpine
     expose:
       - "80"
     ports:
       - "80:80"
       - "443:443"
     volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../certs:/etc/nginx/certs
     depends_on:
       - beta-backend
@@ -25,7 +24,7 @@ services:
   beta-frontend:
     image: juliusse/ssponline-frontend:${IMAGE_TAG:-latest}
     expose:
-      - "5000"
+      - "3000"
     volumes:
       - ./beta.frontend.config.js:/app/build/config.js
     depends_on:

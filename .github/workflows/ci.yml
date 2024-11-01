@@ -109,4 +109,4 @@ jobs:
       - name: Update docker-compose.yml on server
         run: scp -o StrictHostKeyChecking=no -pr -i ~/ssh_key deployment ${{ secrets.AWS_SSH_USER_NAME }}@${{ secrets.AWS_SSH_IP }}:${{ secrets.AWS_SSH_USER_HOME }}
       - name: Update Deployment
-        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ${{ secrets.AWS_SSH_USER_NAME }}@${{ secrets.AWS_SSH_IP }} "cd ${{ secrets.AWS_SSH_USER_HOME }}/deployment && sudo docker-compose pull && sudo docker-compose -p ssponline up -d"
+        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ${{ secrets.AWS_SSH_USER_NAME }}@${{ secrets.AWS_SSH_IP }} "cd ${{ secrets.AWS_SSH_USER_HOME }}/deployment && sudo docker-compose -p ssponline down && sudo docker-compose pull && sudo docker-compose -p ssponline up -d"
