@@ -1,3 +1,3 @@
 window.config = {
-    backendUrl: 'https://api.beta.ssponline.de'
+    backendUrl: 'http://api.beta.ssponline.de'
 }
