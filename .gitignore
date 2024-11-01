@@ -4,3 +4,8 @@ build
 frontend/dist
 frontend/node_modules
 application-secrets.yaml
+.env
+.terraform/
+.terraform.lock.hcl
+.DS_Store
+*.tfstate*
