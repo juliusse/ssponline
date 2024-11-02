@@ -1,28 +1,27 @@
-import {TeamColor} from "../constants/Constants";
+import { TeamColor } from "@/constants/Constants";
 
 export class Team {
-    public static RED = new Team(TeamColor.RED);
-    public static BLUE = new Team(TeamColor.BLUE);
+  public static RED = new Team(TeamColor.RED);
+  public static BLUE = new Team(TeamColor.BLUE);
+  readonly teamColor: TeamColor;
 
-    public static getForColor(color: string) : Team {
-        return color.toUpperCase() === 'RED' ? Team.RED : Team.BLUE;
-    }
+  private constructor(teamColor: TeamColor) {
+    this.teamColor = teamColor;
+  }
 
-    readonly teamColor: TeamColor;
+  public static getForColor(color: string): Team {
+    return color.toUpperCase() === "RED" ? Team.RED : Team.BLUE;
+  }
 
-    private constructor(teamColor: TeamColor) {
-        this.teamColor = teamColor;
-    }
+  public getName() {
+    return this.teamColor.toLowerCase();
+  }
 
-    public getName() {
-        return this.teamColor.toLowerCase();
-    }
+  public getApi() {
+    return this.teamColor;
+  }
 
-    public getApi() {
-        return this.teamColor;
-    }
-
-    public getImgColor() {
-        return this.teamColor.toLowerCase()[0];
-    }
+  public getImgColor() {
+    return this.teamColor.toLowerCase()[0];
+  }
 }

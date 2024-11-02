@@ -31,9 +31,9 @@ public class GameController {
     return toGameDTO(gameId, team, fromIndex);
   }
 
-    private GameDTO toGameDTO(String gameId, Team requestingTeam, int fromIndex) {
-        gameService.getGame(gameId);
-        final var gameActions = gameService.getGameActions(gameId, fromIndex);
+  private GameDTO toGameDTO(String gameId, Team requestingTeam, int fromIndex) {
+    gameService.getGame(gameId);
+    final var gameActions = gameService.getGameActions(gameId, fromIndex);
 
     final var gameActionDTOs =
       gameActions

@@ -1,4 +1,4 @@
 export const AppConfig = {
-    // @ts-ignore
-    backendUrl: () => window.config ? window.config.BACKEND_URL : 'http://localhost:8081'
-}
+  // @ts-expect-error - window.config is defined in index.html
+  backendUrl: () => window.config ? window.config.BACKEND_URL : "http://localhost:8081",
+};
