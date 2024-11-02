@@ -62,7 +62,8 @@
   "scripts": {
     "test": "jest",
     "start": "webpack serve --config config/webpack.local.js",
-    "build": "webpack --config config/webpack.deploy.js"
+    "build": "webpack --config config/webpack.deploy.js",
+    "lint": "eslint src/**/*.{ts,tsx} --fix"
   },
   "eslintConfig": {
     "extends": [

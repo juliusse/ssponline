@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameActionResponseUnitDTO {
-    private Team team;
-    private UnitTypeDTO type;
-    private Point location;
+  private Team team;
+  private UnitTypeDTO type;
+  private Point location;
 
-    private boolean isVisible;
+  private boolean isVisible;
 }

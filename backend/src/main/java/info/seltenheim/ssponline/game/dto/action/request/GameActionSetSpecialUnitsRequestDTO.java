@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GameActionSetSpecialUnitsRequestDTO extends GameActionRequestDTO {
-    private Point trap1;
-    private Point trap2;
-    private Point flag;
+  private Point trap1;
+  private Point trap2;
+  private Point flag;
 
 }

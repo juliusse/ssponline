@@ -10,6 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GameActionResponseFightChooseUnitDTO extends GameActionResponseDTO {
-    private Team team;
-    private UnitTypeDTO type;
+  private Team team;
+  private UnitTypeDTO type;
 }

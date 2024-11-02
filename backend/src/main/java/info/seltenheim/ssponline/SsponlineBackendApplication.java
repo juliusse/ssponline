@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaAuditing
 public class SsponlineBackendApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(SsponlineBackendApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(SsponlineBackendApplication.class, args);
+  }
 
 }

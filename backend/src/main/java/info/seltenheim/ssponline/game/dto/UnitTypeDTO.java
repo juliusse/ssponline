@@ -1,5 +1,5 @@
 package info.seltenheim.ssponline.game.dto;
 
 public enum UnitTypeDTO {
-    ROCK, PAPER, SCISSORS, TRAP, FLAG, HIDDEN
+  ROCK, PAPER, SCISSORS, TRAP, FLAG, HIDDEN
 }

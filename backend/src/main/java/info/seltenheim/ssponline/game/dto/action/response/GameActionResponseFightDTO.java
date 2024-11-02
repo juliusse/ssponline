@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GameActionResponseFightDTO extends GameActionResponseDTO {
-    private Point location;
-    private UnitTypeDTO redType;
-    private UnitTypeDTO blueType;
-    private Team winningTeam;
+  private Point location;
+  private UnitTypeDTO redType;
+  private UnitTypeDTO blueType;
+  private Team winningTeam;
 }
