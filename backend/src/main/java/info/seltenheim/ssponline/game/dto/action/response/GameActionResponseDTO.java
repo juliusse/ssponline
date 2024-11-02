@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameActionResponseDTO {
-    private String gameId;
-    private long timestamp;
-    private int actionId;
-    private GameActionType actionType;
-    private Team activeTeam;
-    private GameState gameState;
+  private String gameId;
+  private long timestamp;
+  private int actionId;
+  private GameActionType actionType;
+  private Team activeTeam;
+  private GameState gameState;
 }

@@ -1,7 +1,7 @@
-import { render } from '@testing-library/react';
-import App from './App';
+import { render } from "@testing-library/react";
+import App from "./App";
 
-test('some dummy test', () => {
+test("some dummy test", () => {
   render(<App />);
   // const linkElement = screen.getByText('GameBoard');
   // expect(linkElement).toBeInTheDocument();

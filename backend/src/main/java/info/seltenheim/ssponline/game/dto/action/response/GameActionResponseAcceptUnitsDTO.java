@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameActionResponseAcceptUnitsDTO extends GameActionResponseDTO {
-    private Team team;
+  private Team team;
 }

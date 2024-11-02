@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GameActionResponseWinDTO extends GameActionResponseDTO {
-    private Team team;
+  private Team team;
 }

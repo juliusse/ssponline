@@ -13,28 +13,28 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MailService {
-    private final MailConfig mailConfig;
-    private final MailjetClient mailjetClient;
+  private final MailConfig mailConfig;
+  private final MailjetClient mailjetClient;
 
-    public void sendGameStartEmail() {
-        TransactionalEmail message = TransactionalEmail
-                .builder()
-                .to(new SendContact("NOT_SET", "some name"))
-                .from(new SendContact(mailConfig.getFromEmailAddress(), "SSP Online"))
-                .htmlPart("<h1>You were invited to a game of SSP Online</h1>")
-                .subject("SSP Online - Game Invitation")
-                .build();
+  public void sendGameStartEmail() {
+    final var message = TransactionalEmail
+      .builder()
+      .to(new SendContact("NOT_SET", "some name"))
+      .from(new SendContact(mailConfig.getFromEmailAddress(), "SSP Online"))
+      .htmlPart("<h1>You were invited to a game of SSP Online</h1>")
+      .subject("SSP Online - Game Invitation")
+      .build();
 
-        SendEmailsRequest request = SendEmailsRequest
-                .builder()
-                .message(message)
-                .build();
+    final var request = SendEmailsRequest
+      .builder()
+      .message(message)
+      .build();
 
-        // act
-        try {
-            request.sendWith(mailjetClient);
-        } catch (MailjetException e) {
-            log.error("Could not send e-mail!", e);
-        }
+    // act
+    try {
+      request.sendWith(mailjetClient);
+    } catch (MailjetException e) {
+      log.error("Could not send e-mail!", e);
     }
+  }
 }

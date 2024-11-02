@@ -22,7 +22,6 @@ databaseChangeLog:
                   name: modified_at
                   type: bigint
         - addPrimaryKey:
-            clustered: true
             columnNames: id
             constraintName: pk_game
             tableName: game
@@ -104,7 +103,6 @@ databaseChangeLog:
                   name: winning_team
                   type: varchar
         - addPrimaryKey:
-            clustered: true
             columnNames: game_id, action_id
             constraintName: pk_game_action
             tableName: game_action
@@ -171,7 +169,6 @@ databaseChangeLog:
                   name: visible
                   type: boolean
         - addPrimaryKey:
-            clustered: true
             columnNames: id
             constraintName: pk_game_action_unit
             tableName: game_action_unit
@@ -241,7 +238,6 @@ databaseChangeLog:
                   name: special_units_blue
                   type: boolean
         - addPrimaryKey:
-            clustered: true
             columnNames: id
             constraintName: pk_game_state_game
             tableName: game_state_game
@@ -303,7 +299,6 @@ databaseChangeLog:
                   name: visible
                   type: boolean
         - addPrimaryKey:
-            clustered: true
             columnNames: id
             constraintName: pk_game_state_unit
             tableName: game_state_unit

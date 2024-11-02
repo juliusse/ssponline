@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GameActionFightChooseUnitRequestDTO extends GameActionRequestDTO {
-    private UnitTypeDTO unitType;
+  private UnitTypeDTO unitType;
 }

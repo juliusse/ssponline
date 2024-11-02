@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GameActionMoveRequestDTO extends GameActionRequestDTO {
-    private Point from;
-    private Point to;
+  private Point from;
+  private Point to;
 }
