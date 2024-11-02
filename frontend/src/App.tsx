@@ -1,4 +1,3 @@
-import React from 'react';
 import './App.sass';
 import {Team} from "./model/Team";
 import {Game} from "./components/Game";

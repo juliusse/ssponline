@@ -1,6 +1,5 @@
 import {Direction, UNIT_THEME} from "../constants/Constants";
 import {Point} from "../model/Point";
-import React from "react";
 
 export function isAdjacent(center: Point, otherField: Point): Direction | null {
     if (center.x === otherField.x && center.y === otherField.y + 1) {
