@@ -171,8 +171,9 @@ export class Game extends React.Component<Props, State> {
   }
 
   processActionError(error: AxiosError) {
-    if (error?.message) {
-      alert(error?.message);
+    if (error?.response?.data) {
+      // @ts-expect-error should be casted to correct type
+      alert(error.response.data.message);
     }
   }
 
