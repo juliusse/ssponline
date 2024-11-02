@@ -118,7 +118,7 @@ resource "aws_instance" "server" {
   ami        = data.aws_ami.amazon_linux_2.id
   instance_type = "t2.micro"
   key_name = aws_key_pair.aws_server_key.key_name
-  security_groups             = [aws_security_group.security.id]
+  vpc_security_group_ids = [aws_security_group.security.id]
 
   subnet_id = aws_subnet.public_subnets[0].id
 
@@ -134,6 +134,11 @@ resource "aws_instance" "server" {
   provisioner "file" {
     source="../deployment"
     destination="/home/ubuntu/deployment"
+  }
+
+  provisioner "file" {
+    source="../certs"
+    destination="/home/ubuntu/certs"
   }
 
   provisioner "remote-exec" {
