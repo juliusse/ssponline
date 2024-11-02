@@ -3,5 +3,3 @@ provider "aws" {
 }
 
 provider "github" {}
-
-provider "random" {}

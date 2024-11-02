@@ -10,3 +10,5 @@ application-secrets.yaml
 .DS_Store
 *.tfstate*
 .tfvars
+fullchain.pem
+privkey.pem
