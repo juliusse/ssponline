@@ -1,5 +1,5 @@
 import axios, {AxiosPromise} from "axios";
-import {AppConfig} from "../config";
+import {AppConfig} from "@/config";
 import {Team} from "../model/Team";
 import {Point} from "../model/Point";
 import {GameState, UnitType} from "../constants/Constants";

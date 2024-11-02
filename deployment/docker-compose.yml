@@ -24,8 +24,8 @@ services:
   beta-frontend:
     image: juliusse/ssponline-frontend:${IMAGE_TAG:-latest}
     expose:
-      - "3000"
-    volumes:
-      - ./beta.frontend.config.js:/app/build/config.js
+      - "8080"
+    env_file:
+      - ./frontend.env
     depends_on:
       - beta-backend

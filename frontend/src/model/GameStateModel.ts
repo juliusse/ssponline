@@ -129,6 +129,7 @@ export class GameStateModel {
         }
     }
 
+    // @ts-ignore
     processActionGameStart(gameStartAction: GameAction) {
         // todo
     }

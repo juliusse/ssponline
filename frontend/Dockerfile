@@ -1,19 +1,11 @@
-FROM node:14.15.5-alpine
-ARG APP_URL
+# production environment
+FROM nginx:1.27-alpine
 
-WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
-ENV REACT_APP_URL $APP_URL
-
-# install app dependencies
-COPY package.json ./
-COPY package-lock.json ./
-RUN npm install --silent
-
-# build app
-COPY . ./
-RUN npm run build
-
-# start app
-RUN npm install -g serve
-ENTRYPOINT ["serve", "-s", "build"]
+COPY ./dist /usr/share/nginx/html
+COPY nginx/conf/* /etc/nginx/conf.d/
+COPY nginx/templates/template-variables.conf /etc/nginx/templates/10-variables.conf.template
+RUN touch /var/run/nginx.pid
+RUN chown -R nginx:nginx /var/run/nginx.pid /usr/share/nginx/html /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
+USER nginx
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]

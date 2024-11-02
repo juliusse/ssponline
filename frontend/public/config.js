@@ -1,3 +1,3 @@
 window.config = {
-    backendUrl: 'http://localhost:8081'
+    BACKEND_URL: 'http://localhost:8081'
 }
