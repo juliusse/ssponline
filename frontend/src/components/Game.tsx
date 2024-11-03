@@ -4,12 +4,13 @@ import { GameState, UnitType } from "@/constants/Constants";
 import { GameStateModel } from "@/model/GameStateModel";
 import { GameActionsListResponse, GameBoardAdapter } from "@/utils/GameBoardAdapter";
 import { Point } from "@/model/Point";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import FightUnitSelector from "@/components/FightUnitSelector";
 import Team from "@/model/Team";
 import GameBoard from "@/components/GameBoard";
 import GameLog from "@/components/GameLog";
 import GameTurnInfo from "@/components/GameTurnInfo";
+import { useConfig } from "@/ConfigProvider";
 
 type GameProps = {
   team: Team
@@ -34,7 +35,8 @@ const Game = ({ team, gameId }: GameProps) => {
   });
   const [intervalId, setIntervalId] = useState<number | null>(null);
 
-  const gameBoardAdapter = new GameBoardAdapter(gameId, team);
+  const config = useConfig();
+  const gameBoardAdapter = new GameBoardAdapter(gameId, team, config.backendUrl);
 
 
   useEffect(() => {
@@ -56,39 +58,50 @@ const Game = ({ team, gameId }: GameProps) => {
     }
   }, [gameState]);
 
-  const loadActions = () => {
-    gameBoardAdapter
-      .getActionsAsync(gameState.lastProcessedAction + 1)
-      .then(processActions)
-      .catch(processActionError);
+  const loadActions = async () => {
+    try {
+      const actions = await gameBoardAdapter.getActionsAsync(gameState.lastProcessedAction + 1);
+      processActions(actions);
+    } catch (error: any) {
+      processActionError(error);
+    }
   };
 
-  const moveUnit = (from: Point, to: Point) => {
-    gameBoardAdapter
-      .sendActionMoveUnit(from, to, gameState.lastProcessedAction + 1)
-      .then(processActions)
-      .catch(processActionError);
+  const moveUnit = async (from: Point, to: Point) => {
+    try {
+      const newActions = await gameBoardAdapter.sendActionMoveUnit(from, to, gameState.lastProcessedAction + 1);
+      processActions(newActions);
+
+    } catch (error: any) {
+      processActionError(error);
+    }
   };
 
-  const handleFightUnitChosen = (unitType: UnitType) => {
-    gameBoardAdapter
-      .sendActionFightUnitChosen(unitType, gameState.lastProcessedAction + 1)
-      .then(processActions)
-      .catch(processActionError);
+  const handleFightUnitChosen = async (unitType: UnitType) => {
+    try {
+      const newActions = await gameBoardAdapter.sendActionFightUnitChosen(unitType, gameState.lastProcessedAction + 1);
+      processActions(newActions);
+    } catch (error: any) {
+      processActionError(error);
+    }
   };
 
-  const handleShuffleClick = () => {
-    gameBoardAdapter
-      .sendActionShuffleUnits(gameState.lastProcessedAction + 1)
-      .then(processActions)
-      .catch(processActionError);
+  const handleShuffleClick = async () => {
+    try {
+      const newActions = await gameBoardAdapter.sendActionShuffleUnits(gameState.lastProcessedAction + 1);
+      processActions(newActions);
+    } catch (error: any) {
+      processActionError(error);
+    }
   };
 
-  const handleAcceptClick = () => {
-    gameBoardAdapter
-      .sendActionAcceptUnits(gameState.lastProcessedAction + 1)
-      .then(processActions)
-      .catch(processActionError);
+  const handleAcceptClick = async () => {
+    try {
+      const newActions = await gameBoardAdapter.sendActionAcceptUnits(gameState.lastProcessedAction + 1);
+      processActions(newActions);
+    } catch (error: any) {
+      processActionError(error);
+    }
   };
 
   const handleRestUnitsClick = () => {
@@ -100,25 +113,27 @@ const Game = ({ team, gameId }: GameProps) => {
     );
   };
 
-  const handleAcceptSpecialUnitsClick = () => {
-    gameBoardAdapter
-      .sendActionSelectSpecialUnits(
-        setUpUnits.trap1!,
-        setUpUnits.trap2!,
-        setUpUnits.flag!,
-        gameState.lastProcessedAction + 1,
-      )
-      .then(processActions)
-      .catch(processActionError)
-      .finally(() => {
-        setSetUpUnits(
-          {
-            trap1: null,
-            trap2: null,
-            flag: null,
-          },
+  const handleAcceptSpecialUnitsClick = async () => {
+    try {
+      const newActions = await gameBoardAdapter
+        .sendActionSelectSpecialUnits(
+          setUpUnits.trap1!,
+          setUpUnits.trap2!,
+          setUpUnits.flag!,
+          gameState.lastProcessedAction + 1,
         );
-      });
+      processActions(newActions);
+    } catch (error: any) {
+      processActionError(error);
+    }
+
+    setSetUpUnits(
+      {
+        trap1: null,
+        trap2: null,
+        flag: null,
+      },
+    );
   };
 
   const handleHistoryActionClick = (actionId: number) => {
@@ -137,14 +152,13 @@ const Game = ({ team, gameId }: GameProps) => {
     setDisplayedUntilActionId(actionId);
   };
 
-  const processActions = (response: AxiosResponse<GameActionsListResponse>) => {
-    const newGameState = gameState.processActions(response.data.gameActions);
+  const processActions = (response: GameActionsListResponse) => {
+    const newGameState = gameState.processActions(response.gameActions);
     setGameState(GameStateModel.copy(newGameState));
   };
 
-  const processActionError = (error: AxiosError) => {
-    if (error?.response?.data) {
-      // @ts-expect-error should be casted to correct type
+  const processActionError = (error: Error) => {
+    if (error instanceof AxiosError && error.response?.data) {
       alert(error.response.data.message);
     }
   };
@@ -167,15 +181,15 @@ const Game = ({ team, gameId }: GameProps) => {
     setIntervalId(null);
   };
 
-  const handleMoveUnit = (from: Point, to: Point) => {
-    moveUnit(from, to);
+  const handleMoveUnit = async (from: Point, to: Point) => {
+    await moveUnit(from, to);
   };
 
   const handlePlaceSpecialUnit = (setUpUnits: GameSetupState) => {
-    setSetUpUnits({...setUpUnits});
+    setSetUpUnits({ ...setUpUnits });
   };
 
-  if (gameState.board == null || !gameState.gameState) {
+  if (gameState.board == null) {
     return <div />;
   }
 

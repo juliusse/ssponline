@@ -13,7 +13,7 @@ type GameBoardProps = {
   gameState: GameStateModel;
   isShadowState: boolean;
   setUpUnits: GameSetupState;
-  onMoveUnit: (from: Point, to: Point) => void;
+  onMoveUnit: (from: Point, to: Point) => Promise<void>;
   onPlaceSpecialUnit: (setUpUnits: GameSetupState) => void;
 }
 

@@ -5,7 +5,7 @@ import Team from "@/model/Team";
 import Unit from "@/components/Unit";
 
 type FightUnitSelectorProps = {
-  gameState: GameState;
+  gameState: GameState | null;
   onChooseUnit: (unitType: UnitType) => void;
   choice: UnitType | null;
   team: Team;

@@ -1,5 +1,4 @@
-import axios, { AxiosPromise } from "axios";
-import { AppConfig } from "@/config";
+import axios from "axios";
 import { Point } from "@/model/Point";
 import { GameState, UnitType } from "@/constants/Constants";
 import { GameAction } from "@/model/gameaction/GameAction";
@@ -17,14 +16,14 @@ export class GameBoardAdapter {
   readonly requestingTeam: Team;
   readonly backendUrl: string;
 
-  constructor(gameId: string, requestingTeam: Team) {
+  constructor(gameId: string, requestingTeam: Team, backendUrl: string) {
     this.gameId = gameId;
     this.requestingTeam = requestingTeam;
-    this.backendUrl = AppConfig.backendUrl();
+    this.backendUrl = backendUrl;
   }
 
-  getActionsAsync(fromIndex = 0): AxiosPromise<GameActionsListResponse> {
-    return axios({
+  async getActionsAsync(fromIndex = 0): Promise<GameActionsListResponse> {
+    const response = await axios({
       url: this.backendUrl + `/game/${this.gameId}`,
       transformResponse: this.toGameAction,
       params: {
@@ -32,43 +31,46 @@ export class GameBoardAdapter {
         fromIndex,
       },
     });
+
+    return response.data;
   }
 
-  sendActionShuffleUnits(fromIndex: number): AxiosPromise<GameActionsListResponse> {
+  async sendActionShuffleUnits(fromIndex: number): Promise<GameActionsListResponse> {
     return this.sendAction({
       actionType: "SHUFFLE_UNITS",
     }, fromIndex);
   }
 
-  sendActionAcceptUnits(fromIndex: number): AxiosPromise<GameActionsListResponse> {
+  async sendActionAcceptUnits(fromIndex: number): Promise<GameActionsListResponse> {
     return this.sendAction({
       actionType: "ACCEPT_UNITS",
     }, fromIndex);
   }
 
-  sendActionSelectSpecialUnits(trap1: Point, trap2: Point, flag: Point, fromIndex: number): AxiosPromise<GameActionsListResponse> {
+  async sendActionSelectSpecialUnits(trap1: Point, trap2: Point, flag: Point, fromIndex: number): Promise<GameActionsListResponse> {
     return this.sendAction({
       actionType: "SET_SPECIAL_UNITS",
       trap1, trap2, flag,
     }, fromIndex);
   }
 
-  sendActionMoveUnit(from: Point, to: Point, fromIndex: number): AxiosPromise<GameActionsListResponse> {
+  async sendActionMoveUnit(from: Point, to: Point, fromIndex: number): Promise<GameActionsListResponse> {
     return this.sendAction({
       actionType: "MOVE"
       , from, to,
     }, fromIndex);
   }
 
-  sendActionFightUnitChosen(unitType: UnitType, fromIndex: number): AxiosPromise<GameActionsListResponse> {
+  async sendActionFightUnitChosen(unitType: UnitType, fromIndex: number): Promise<GameActionsListResponse> {
     return this.sendAction({
       actionType: "FIGHT_CHOOSE_UNIT",
       unitType,
     }, fromIndex);
   }
 
-  sendAction(data: any, fromIndex: number): AxiosPromise<GameActionsListResponse> {
-    return axios({
+  async sendAction(data: any, fromIndex: number): Promise<GameActionsListResponse> {
+    const response = await
+     axios({
       method: "post",
       url: this.backendUrl + `/game/${this.gameId}/action`,
       transformResponse: this.toGameAction,
@@ -78,6 +80,7 @@ export class GameBoardAdapter {
         fromIndex,
       },
     });
+    return response.data;
   }
 
   toGameAction(response: string): GameActionsListResponse {
