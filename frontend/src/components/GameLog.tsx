@@ -1,19 +1,17 @@
-import React from "react";
 import "./GameLog.sass";
 import { GameAction } from "@/model/gameaction/GameAction";
 import { GameActionType } from "@/model/gameaction/GameActionType";
-import { Team } from "@/model/Team";
 import moment from "moment";
+import Team from "@/model/Team";
 
-type Props = {
+type GameLogProps = {
   displayedUntilActionId: number | null;
   gameActions: Array<GameAction>;
   onActionClick: (actionId: number) => void;
 }
 
-export class GameLog extends React.Component<Props> {
-
-  toLogLine(action: GameAction): JSX.Element {
+const GameLog = ({ displayedUntilActionId, gameActions, onActionClick }: GameLogProps) => {
+  const LogLine = ({ action }: { action: GameAction }) => {
     let content = null;
     switch (action.actionType) {
       case GameActionType.CONFIGURE:
@@ -94,10 +92,10 @@ export class GameLog extends React.Component<Props> {
         <div className="GameLogEntryTimeContent"><span>{moment(action.timestamp).fromNow()}</span></div>
         ]
       </div>);
-    const active = !this.props.displayedUntilActionId || action.actionId <= this.props.displayedUntilActionId;
+    const active = !displayedUntilActionId || action.actionId <= displayedUntilActionId;
     const activeClass = active ? "active" : "disabled";
     const handleClick = () => {
-      this.props.onActionClick(action.actionId);
+      onActionClick(action.actionId);
     };
     return (
       <div key={`action_${action.actionId}`}
@@ -107,18 +105,18 @@ export class GameLog extends React.Component<Props> {
         {content}
       </div>
     );
-  }
+  };
 
-  render() {
-    const actions = this.props.gameActions;
-    const entries = [];
-    for (let i = actions.length - 1; i >= 0; i--) {
-      entries.push(this.toLogLine(actions[i]));
-    }
-    return (
-      <div className="GameLog">
-        {entries}
-      </div>
-    );
+  const actions = gameActions;
+  const entries = [];
+  for (let i = actions.length - 1; i >= 0; i--) {
+    entries.push(<LogLine key={`log-entry-${i}`} action={actions[i]} />);
   }
-}
+  return (
+    <div className="GameLog">
+      {entries}
+    </div>
+  );
+};
+
+export default GameLog;

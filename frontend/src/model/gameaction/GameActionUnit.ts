@@ -1,4 +1,4 @@
-import { Team } from "@/model/Team";
+import Team from "@/model/Team";
 import { UnitType } from "@/constants/Constants";
 import { Point } from "@/model/Point";
 

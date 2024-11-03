@@ -1,5 +1,5 @@
 import { UNIT_THEME, UnitType } from "@/constants/Constants";
-import { Team } from "./Team";
+import Team from "@/model/Team";
 
 export class UnitModel {
   readonly team: Team;

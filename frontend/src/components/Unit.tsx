@@ -1,4 +1,3 @@
-import React from "react";
 import "./Unit.sass";
 import { UnitModel } from "@/model/UnitModel";
 import { UnitType } from "@/constants/Constants";
@@ -9,31 +8,25 @@ type UnitProps = {
   isActive: boolean;
 }
 
-
-export class Unit extends React.Component<UnitProps> {
-  constructor(props: UnitProps) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick() {
-    if (!this.props.onClick || !this.props.model) {
+const Unit = ({ model, onClick, isActive }: UnitProps) => {
+  const handleClick = () => {
+    if (!onClick || !model) {
       return;
     }
-    this.props.onClick(this.props.model.type);
-  }
+    onClick(model.type);
+  };
 
-  render() {
-    if (this.props.model == null) {
-      return <div></div>;
-    }
-    return (
-      <div className={this.props.isActive ? "Unit active" : "Unit"}
-           onClick={this.handleClick}>
-        <img alt={this.props.model.getName()}
-             src={this.props.model.getImage()}
-        />
-      </div>
-    );
+  if (model == null) {
+    return <div></div>;
   }
-}
+  return (
+    <div className={isActive ? "Unit active" : "Unit"}
+         onClick={handleClick}>
+      <img alt={model.getName()}
+           src={model.getImage()}
+      />
+    </div>
+  );
+};
+
+export default Unit;

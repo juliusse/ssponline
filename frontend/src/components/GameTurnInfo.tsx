@@ -2,10 +2,10 @@ import React from "react";
 import "./GameTurnInfo.sass";
 import { GameAction } from "@/model/gameaction/GameAction";
 import { GameActionType } from "@/model/gameaction/GameActionType";
-import { Team } from "@/model/Team";
 import { GameSetupState } from "./Game";
+import Team from "@/model/Team";
 
-type Props = {
+type GameTurnInfoProps = {
   playerTeam: Team;
   actions: Array<GameAction>;
   setUpUnits: GameSetupState;
@@ -15,10 +15,10 @@ type Props = {
   onAcceptSpecialUnitsClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-export class GameTurnInfo extends React.Component<Props> {
+const GameTurnInfo = ({ playerTeam, actions, setUpUnits, onShuffleClick, onAcceptShuffleClick, onResetSpecialUnitsClick, onAcceptSpecialUnitsClick }: GameTurnInfoProps) => {
 
-  getMoveTurnInfoContent(action: GameAction) {
-    const isMyAction = action.activeTeam === this.props.playerTeam;
+  const MoveTurnInfoContent = ({action} : {action: GameAction}) => {
+    const isMyAction = action.activeTeam === playerTeam;
 
     return isMyAction ?
       <div className="GameTurnInfoContent">
@@ -31,10 +31,10 @@ export class GameTurnInfo extends React.Component<Props> {
   }
 
 
-  toTurnInfo(actions: Array<GameAction>): JSX.Element {
+  const TurnInfo = ({ actions } : {actions : Array<GameAction>}) => {
     let content = <div />;
     actions.forEach(action => {
-      const isMyAction = action.team === this.props.playerTeam;
+      const isMyAction = action.team === playerTeam;
 
       switch (action.actionType) {
         case GameActionType.CONFIGURE:
@@ -45,9 +45,9 @@ export class GameTurnInfo extends React.Component<Props> {
           content =
             <div className="GameTurnInfoContent">
               Please
-              <button onClick={this.props.onShuffleClick}>Shuffle Units</button>
+              <button onClick={onShuffleClick}>Shuffle Units</button>
               until you are happy and then
-              <button onClick={this.props.onAcceptShuffleClick}>Accept Units</button>
+              <button onClick={onAcceptShuffleClick}>Accept Units</button>
             </div>;
           break;
         case GameActionType.ACCEPT_UNITS:
@@ -55,8 +55,8 @@ export class GameTurnInfo extends React.Component<Props> {
             break;
           }
 
-          const trapsAreSet = this.props.setUpUnits.trap1 && this.props.setUpUnits.trap2;
-          const flagIsSet = this.props.setUpUnits.flag;
+          const trapsAreSet = setUpUnits.trap1 && setUpUnits.trap2;
+          const flagIsSet = setUpUnits.flag;
           if (!trapsAreSet) {
             content =
               <div className="GameTurnInfoContent">
@@ -72,10 +72,10 @@ export class GameTurnInfo extends React.Component<Props> {
             content =
               <div className="GameTurnInfoContent">
                 If your units are set correctly
-                <button onClick={this.props.onAcceptSpecialUnitsClick}>Accept them</button>
+                <button onClick={onAcceptSpecialUnitsClick}>Accept them</button>
                 <br />
                 Otherwise you can
-                <button onClick={this.props.onResetSpecialUnitsClick}>Reset them</button>
+                <button onClick={onResetSpecialUnitsClick}>Reset them</button>
               </div>;
 
           }
@@ -92,11 +92,11 @@ export class GameTurnInfo extends React.Component<Props> {
           break;
         case GameActionType.START:
         case GameActionType.MOVE:
-          content = this.getMoveTurnInfoContent(action);
+          content = <MoveTurnInfoContent action={action} />;
           break;
         case GameActionType.FIGHT:
           if (action.winningTeam) {
-            content = this.getMoveTurnInfoContent(action);
+            content = <MoveTurnInfoContent action={action} />;
             break;
           }
 
@@ -128,11 +128,11 @@ export class GameTurnInfo extends React.Component<Props> {
     return content;
   }
 
-  render() {
     return (
       <div className="GameTurnInfo">
-        {this.toTurnInfo(this.props.actions)}
+        <TurnInfo actions={actions} />
       </div>
-    );
-  }
+    )
 }
+
+export default GameTurnInfo;

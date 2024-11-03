@@ -1,12 +1,12 @@
 import axios, { AxiosPromise } from "axios";
 import { AppConfig } from "@/config";
-import { Team } from "@/model/Team";
 import { Point } from "@/model/Point";
 import { GameState, UnitType } from "@/constants/Constants";
 import { GameAction } from "@/model/gameaction/GameAction";
 import { GameActionResponse } from "@/model/gameaction/response/GameActionResponse";
 import { GameActionType } from "@/model/gameaction/GameActionType";
 import { GameActionUnit } from "@/model/gameaction/GameActionUnit";
+import Team from "@/model/Team";
 
 export type GameActionsListResponse = {
   gameActions: Array<GameAction>;
