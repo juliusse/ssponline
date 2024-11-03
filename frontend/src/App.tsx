@@ -1,6 +1,7 @@
 import "./App.sass";
 import Team from "@/model/Team";
 import Game from "@/components/Game";
+import { ConfigProvider } from "@/ConfigProvider";
 
 function getQueryVariable(variable: string) {
   const query = window.location.search.substring(1);
@@ -22,10 +23,10 @@ const App = () => {
   const devBoard = devMode ? <Game team={otherTeam} gameId={gameId} /> : null;
 
   return (
-    <div>
+    <ConfigProvider>
       <Game team={team} gameId={gameId} />
       {devBoard}
-    </div>
+    </ConfigProvider>
   );
 }
 
