@@ -1,6 +1,4 @@
-import React from "react";
 import "./GameBoardField.sass";
-import { Unit } from "./Unit";
 import { GameState, UNIT_THEME, UnitType } from "@/constants/Constants";
 import { Point } from "@/model/Point";
 import { GameStateModel } from "@/model/GameStateModel";
@@ -8,6 +6,7 @@ import { UnitModel } from "@/model/UnitModel";
 import { GameSetupState } from "./Game";
 import { GameActionType } from "@/model/gameaction/GameActionType";
 import { directionToImg, invertDirection, isAdjacent } from "@/utils/LocationUtils";
+import Unit from "@/components/Unit";
 
 type GameBoardFieldProps = {
   state: GameStateModel;
@@ -19,105 +18,101 @@ type GameBoardFieldProps = {
   onClick: (location: Point) => void;
 }
 
-export class GameBoardField extends React.Component<GameBoardFieldProps> {
-  readonly location: Point;
+const GameBoardField = ({
+                          state,
+                          setUpUnits,
+                          selectedField,
+                          location,
+                          color,
+                          displayInverted,
+                          onClick,
+                        }: GameBoardFieldProps) => {
 
-  constructor(props: GameBoardFieldProps) {
-    super(props);
-    this.location = props.location;
-    this.handleClick = this.handleClick.bind(this);
-  }
 
-  handleClick() {
-    this.props.onClick(this.location);
-  }
+  const getUnit = (): UnitModel | null => {
+    return state.board![location.y][location.x];
+  };
 
-  getUnit(): UnitModel | null {
-    return this.props.state.board![this.location.y][this.location.x];
-  }
+  const isUnitsTeamTurn = () => {
+    const unit = getUnit();
+    return unit != null && unit.team === state.activeTeam;
+  };
 
-  isUnitsTeamTurn() {
-    const unit = this.getUnit();
-    return unit != null && unit.team === this.props.state.activeTeam;
-  }
-
-  isFightLocation() {
-    const fightLocation = this.props.state.fightLocation;
+  const isFightLocation = () => {
+    const fightLocation = state.fightLocation;
     if (fightLocation == null) {
       return;
     }
 
-    return fightLocation.isEqual(this.location);
-  }
+    return fightLocation.isEqual(location);
+  };
 
-  classSelected(): string {
-    const selectedField = this.props.selectedField;
-    return this.location.isEqual(selectedField) ? "selected" : "";
-  }
+  const classSelected = (): string => {
+    return location.isEqual(selectedField) ? "selected" : "";
+  };
 
-  isClickable(): boolean {
-    const gameState = this.props.state.gameState;
-    const playerTeam = this.props.state.playerTeam;
-    const unit = this.getUnit();
+  const isClickable = (): boolean => {
+    const gameState = state.gameState;
+    const playerTeam = state.playerTeam;
+    const unit = getUnit();
     if (gameState === GameState.SETUP ||
       (gameState === GameState.TURN &&
         unit?.team === playerTeam &&
         unit.isMovable() &&
-        this.isUnitsTeamTurn())) {
+        isUnitsTeamTurn())) {
       return true;
     }
 
     return false;
+  };
+
+  const unit = getUnit();
+  let isClickableValue = isClickable();
+  let content = <Unit model={unit} isActive={false} onClick={() => null} />;
+
+  if (state.gameState === GameState.SETUP) {
+    if (location.isEqual(setUpUnits.trap1) ||
+      location.isEqual(setUpUnits.trap2)) {
+      const trap = new UnitModel(state.playerTeam, UnitType.TRAP, false);
+      content = <img alt={trap.getName()} src={trap.getImage()} />;
+    }
+    if (location.isEqual(setUpUnits.flag)) {
+      const flag = new UnitModel(state.playerTeam, UnitType.FLAG, false);
+      content = <img alt={flag.getName()} src={flag.getImage()} />;
+    }
   }
 
-  render() {
-    const unit = this.getUnit();
-    let isClickable = this.isClickable();
-    let content = <Unit model={unit} isActive={false} onClick={() => null} />;
+  const lastAction = state.getLastAction();
+  if (lastAction && lastAction.actionType === GameActionType.MOVE) {
+    const adjacentDirection = isAdjacent(lastAction.to!, location);
 
-    if (this.props.state.gameState === GameState.SETUP) {
-      if (this.location.isEqual(this.props.setUpUnits.trap1) ||
-        this.location.isEqual(this.props.setUpUnits.trap2)) {
-        const trap = new UnitModel(this.props.state.playerTeam, UnitType.TRAP, false);
-        content = <img alt={trap.getName()} src={trap.getImage()} />;
-      }
-      if (this.location.isEqual(this.props.setUpUnits.flag)) {
-        const flag = new UnitModel(this.props.state.playerTeam, UnitType.FLAG, false);
-        content = <img alt={flag.getName()} src={flag.getImage()} />;
-      }
+    if (location.isEqual(lastAction.from!) && adjacentDirection) {
+      const direction = displayInverted ? adjacentDirection : invertDirection(adjacentDirection);
+      content = directionToImg(direction);
     }
-
-    const lastAction = this.props.state.getLastAction();
-    if (lastAction && lastAction.actionType === GameActionType.MOVE) {
-      const adjacentDirection = isAdjacent(lastAction.to!, this.location);
-
-      if (this.location.isEqual(lastAction.from!) && adjacentDirection) {
-        const direction = this.props.displayInverted ? adjacentDirection : invertDirection(adjacentDirection);
-        content = directionToImg(direction);
-      }
-    }
-
-    if (this.isFightLocation()) {
-      content = <img alt="fight" src={`/assets/img/${UNIT_THEME}/kampf.gif`} />;
-    }
-
-    if (!this.isUnitsTeamTurn() && this.props.selectedField != null) {
-      const selectedField = this.props.selectedField;
-      const direction = isAdjacent(selectedField, this.props.location);
-
-      if (direction != null) {
-        const displayedDirection = this.props.displayInverted ? invertDirection(direction) : direction;
-        isClickable = true;
-        content = directionToImg(displayedDirection);
-      }
-    }
-
-    const isClickableClass = isClickable ? "clickable" : "";
-    const classes = `GameBoardField ${this.props.color} ${this.classSelected()} ${isClickableClass}`;
-    return (
-      <div className={classes} onClick={this.handleClick}>
-        {content}
-      </div>
-    );
   }
-}
+
+  if (isFightLocation()) {
+    content = <img alt="fight" src={`/assets/img/${UNIT_THEME}/kampf.gif`} />;
+  }
+
+  if (!isUnitsTeamTurn() && selectedField != null) {
+    const direction = isAdjacent(selectedField, location);
+
+    if (direction != null) {
+      const displayedDirection = displayInverted ? invertDirection(direction) : direction;
+      isClickableValue = true;
+      content = directionToImg(displayedDirection);
+    }
+  }
+
+  const isClickableClass = isClickableValue ? "clickable" : "";
+  const classes = `GameBoardField ${color} ${classSelected()} ${isClickableClass}`;
+  return (
+    <div className={classes} onClick={() => onClick(location)}>
+      {content}
+    </div>
+  );
+};
+
+export default GameBoardField;

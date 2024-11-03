@@ -1,8 +1,8 @@
-import { Unit } from "./Unit";
 import { UnitModel } from "@/model/UnitModel";
 import { GameState, UnitType } from "@/constants/Constants";
 import "./FightUnitSelector.sass";
 import Team from "@/model/Team";
+import Unit from "@/components/Unit";
 
 type FightUnitSelectorProps = {
   gameState: GameState;

@@ -5,11 +5,11 @@ import { GameStateModel } from "@/model/GameStateModel";
 import { GameActionsListResponse, GameBoardAdapter } from "@/utils/GameBoardAdapter";
 import { Point } from "@/model/Point";
 import { AxiosError, AxiosResponse } from "axios";
-import { GameBoard } from "./GameBoard";
-import { GameLog } from "./GameLog";
-import { GameTurnInfo } from "./GameTurnInfo";
 import FightUnitSelector from "@/components/FightUnitSelector";
 import Team from "@/model/Team";
+import GameBoard from "@/components/GameBoard";
+import GameLog from "@/components/GameLog";
+import GameTurnInfo from "@/components/GameTurnInfo";
 
 type GameProps = {
   team: Team
