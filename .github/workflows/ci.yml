@@ -103,15 +103,27 @@ jobs:
         run: docker tag juliusse/ssponline-frontend:$GITHUB_SHA juliusse/ssponline-frontend:latest
       - name: Push fe image
         run: docker push juliusse/ssponline-frontend:latest
-  production-deploy:
+  beta-deploy:
     needs: [ pre-production-deploy ]
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Add ssh key
-        run: echo "${{ secrets.AWS_SSH_KEY }}" >> ~/ssh_key && chmod 600 ~/ssh_key
+        run: echo "${{ secrets.BETA_AWS_SSH_KEY }}" >> ~/ssh_key && chmod 600 ~/ssh_key
       - name: Update docker-compose.yml on server
-        run: scp -o StrictHostKeyChecking=no -pr -i ~/ssh_key deployment ${{ secrets.AWS_SSH_USER_NAME }}@${{ secrets.AWS_SSH_IP }}:${{ secrets.AWS_SSH_USER_HOME }}
+        run: scp -o StrictHostKeyChecking=no -pr -i ~/ssh_key deployment/beta ${{ secrets.BETA_AWS_SSH_USER_NAME }}@${{ secrets.BETA_AWS_SSH_IP }}:${{ secrets.BETA_AWS_SSH_USER_HOME }}
       - name: Update Deployment
-        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ${{ secrets.AWS_SSH_USER_NAME }}@${{ secrets.AWS_SSH_IP }} "cd ${{ secrets.AWS_SSH_USER_HOME }}/deployment && sudo docker compose -p ssponline down && sudo docker compose pull && sudo docker compose -p ssponline up -d"
+        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ${{ secrets.BETA_AWS_SSH_USER_NAME }}@${{ secrets.BETA_AWS_SSH_IP }} "cd ${{ secrets.BETA_AWS_SSH_USER_HOME }}/deployment && sudo docker compose -p ssponline down && sudo docker compose pull && sudo docker compose -p ssponline up -d"
+  dev-deploy:
+    needs: [ pre-production-deploy ]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add ssh key
+        run: echo "${{ secrets.DEV_AWS_SSH_KEY }}" >> ~/ssh_key && chmod 600 ~/ssh_key
+      - name: Update docker-compose.yml on server
+        run: scp -o StrictHostKeyChecking=no -pr -i ~/ssh_key deployment/dev ${{ secrets.DEV_AWS_SSH_USER_NAME }}@${{ secrets.DEV_AWS_SSH_IP }}:${{ secrets.DEV_AWS_SSH_USER_HOME }}
+      - name: Update Deployment
+        run: ssh -o StrictHostKeyChecking=no -i ~/ssh_key ${{ secrets.DEV_AWS_SSH_USER_NAME }}@${{ secrets.DEV_AWS_SSH_IP }} "cd ${{ secrets.DEV_AWS_SSH_USER_HOME }}/deployment && sudo docker compose -p ssponline down && sudo docker compose pull && sudo docker compose -p ssponline up -d"

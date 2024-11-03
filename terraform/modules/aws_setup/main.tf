@@ -1,11 +1,12 @@
-resource "tls_private_key" "ssh_server_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
+locals {
+  public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  private_subnet_cidrs = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
+  azs = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 }
 
 resource "aws_key_pair" "aws_server_key" {
   key_name   = "${var.app_name}-${var.stage}-server-key"
-  public_key = tls_private_key.ssh_server_key.public_key_openssh
+  public_key = var.ssh_public_key
 }
 
 resource "aws_vpc" "vpc" {
@@ -19,10 +20,10 @@ resource "aws_vpc" "vpc" {
 }
 
 resource "aws_subnet" "public_subnets" {
-  count      = length(var.public_subnet_cidrs)
+  count      = length(local.public_subnet_cidrs)
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = element(var.public_subnet_cidrs, count.index)
-  availability_zone = element(var.azs, count.index)
+  cidr_block = element(local.public_subnet_cidrs, count.index)
+  availability_zone = element(local.azs, count.index)
 
   map_public_ip_on_launch = true
 
@@ -32,10 +33,10 @@ resource "aws_subnet" "public_subnets" {
 }
 
 resource "aws_subnet" "private_subnets" {
-  count      = length(var.private_subnet_cidrs)
+  count      = length(local.private_subnet_cidrs)
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = element(var.private_subnet_cidrs, count.index)
-  availability_zone = element(var.azs, count.index)
+  cidr_block = element(local.private_subnet_cidrs, count.index)
+  availability_zone = element(local.azs, count.index)
 
   map_public_ip_on_launch = false
   tags = {
@@ -57,7 +58,7 @@ resource "aws_route_table" "public_route_table" {
 }
 
 resource "aws_route_table_association" "public_subnet_asso" {
-  count = length(var.public_subnet_cidrs)
+  count = length(local.public_subnet_cidrs)
   subnet_id      = element(aws_subnet.public_subnets[*].id, count.index)
   route_table_id = aws_route_table.public_route_table.id
 }
@@ -127,17 +128,17 @@ resource "aws_instance" "server" {
   }
 
   provisioner "file" {
-    source="./resources/setup-server.sh"
+    source="../../modules/aws_setup/resources/setup-server.sh"
     destination="/tmp/setup-server.sh"
   }
 
   provisioner "file" {
-    source="../deployment"
+    source="../../../deployment/${var.stage}"
     destination="/home/ubuntu/deployment"
   }
 
   provisioner "file" {
-    source="../certs"
+    source="../../../certs"
     destination="/home/ubuntu/certs"
   }
 
@@ -152,7 +153,7 @@ resource "aws_instance" "server" {
     type        = "ssh"
     host        = self.public_ip
     user        = "ubuntu"
-    private_key = tls_private_key.ssh_server_key.private_key_pem
+    private_key = var.ssh_private_key_pem
     timeout     = "4m"
   }
 }
@@ -160,28 +161,4 @@ resource "aws_instance" "server" {
 resource "aws_eip" "lb" {
   instance = aws_instance.server.id
   domain   = "vpc"
-}
-
-resource "github_actions_secret" "ssponline_aws_ssh_key" {
-  repository       = "ssponline"
-  secret_name      = "AWS_SSH_KEY"
-  plaintext_value = tls_private_key.ssh_server_key.private_key_pem
-}
-
-resource "github_actions_secret" "ssponline_aws_ssh_ip" {
-  repository       = "ssponline"
-  secret_name      = "AWS_SSH_IP"
-  plaintext_value = aws_eip.lb.public_ip
-}
-
-resource "github_actions_secret" "ssponline_aws_ssh_user" {
-  repository       = "ssponline"
-  secret_name      = "AWS_SSH_USER_NAME"
-  plaintext_value = "ubuntu"
-}
-
-resource "github_actions_secret" "ssponline_aws_ssh_user_home" {
-  repository       = "ssponline"
-  secret_name      = "AWS_SSH_USER_HOME"
-  plaintext_value = "/home/ubuntu"
 }
