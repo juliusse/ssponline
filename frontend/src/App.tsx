@@ -1,6 +1,6 @@
 import "./App.sass";
-import { Team } from "./model/Team";
-import { Game } from "./components/Game";
+import Team from "@/model/Team";
+import Game from "@/components/Game";
 
 function getQueryVariable(variable: string) {
   const query = window.location.search.substring(1);
@@ -13,7 +13,7 @@ function getQueryVariable(variable: string) {
   }
 }
 
-function App() {
+const App = () => {
   const devMode = getQueryVariable("dev") || false;
   const gameId = getQueryVariable("gameId") || "dev";
   const team = Team.getForColor(getQueryVariable("team") || "RED");

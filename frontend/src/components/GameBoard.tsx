@@ -3,10 +3,10 @@ import "./GameBoard.sass";
 import { GameBoardField } from "./GameBoardField";
 import { GameState, UnitType } from "@/constants/Constants";
 import { GameStateModel } from "@/model/GameStateModel";
-import { Team } from "@/model/Team";
 import { Point } from "@/model/Point";
 import { GameSetupState } from "./Game";
 import { isAdjacent } from "@/utils/LocationUtils";
+import Team from "@/model/Team";
 
 type GameBoardProps = {
   team: Team;

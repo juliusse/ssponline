@@ -1,29 +1,21 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import "./Game.sass";
 import { GameState, UnitType } from "@/constants/Constants";
-import { FightUnitSelector } from "./FightUnitSelector";
 import { GameStateModel } from "@/model/GameStateModel";
 import { GameActionsListResponse, GameBoardAdapter } from "@/utils/GameBoardAdapter";
-import { Team } from "@/model/Team";
 import { Point } from "@/model/Point";
 import { AxiosError, AxiosResponse } from "axios";
 import { GameBoard } from "./GameBoard";
 import { GameLog } from "./GameLog";
 import { GameTurnInfo } from "./GameTurnInfo";
-import { isAdjacent } from "@/utils/LocationUtils";
+import FightUnitSelector from "@/components/FightUnitSelector";
+import Team from "@/model/Team";
 
-type Props = {
+type GameProps = {
   team: Team
   gameId: string
 }
 
-type State = {
-  gameState: GameStateModel
-  displayedUntilActionId: number | null,
-  shadowGameState: GameStateModel | null
-  selectedField: Point | null
-  setUpUnits: GameSetupState
-}
 
 export type GameSetupState = {
   trap1: Point | null
@@ -31,213 +23,186 @@ export type GameSetupState = {
   flag: Point | null
 }
 
-export class Game extends React.Component<Props, State> {
-  readonly team: Team;
-  readonly gameBoardAdapter: GameBoardAdapter;
+const Game = ({ team, gameId }: GameProps) => {
+  const [gameState, setGameState] = useState(new GameStateModel(team));
+  const [displayedUntilActionId, setDisplayedUntilActionId] = useState<number | null>(null);
+  const [shadowGameState, setShadowGameState] = useState<GameStateModel | null>(null);
+  const [setUpUnits, setSetUpUnits] = useState<GameSetupState>({
+    trap1: null,
+    trap2: null,
+    flag: null,
+  });
+  const [intervalId, setIntervalId] = useState<number | null>(null);
 
-  private intervalId: number | null = null;
+  const gameBoardAdapter = new GameBoardAdapter(gameId, team);
 
-  constructor(props: Props) {
-    super(props);
-    this.team = props.team;
-    this.gameBoardAdapter = new GameBoardAdapter(props.gameId, this.team);
-    this.state = {
-      gameState: new GameStateModel(this.team),
-      displayedUntilActionId: null,
-      shadowGameState: null,
-      selectedField: null,
-      setUpUnits: {
-        trap1: null,
-        trap2: null,
-        flag: null,
-      },
+
+  useEffect(() => {
+    loadActions();
+    return () => {
+      stopCheck();
     };
-    this.handleMoveUnit = this.handleMoveUnit.bind(this);
-    this.handlePlaceSpecialUnit = this.handlePlaceSpecialUnit.bind(this);
+  }, []);
 
-    this.handleFightUnitChosen = this.handleFightUnitChosen.bind(this);
-    this.handleShuffleClick = this.handleShuffleClick.bind(this);
-    this.handleAcceptClick = this.handleAcceptClick.bind(this);
-    this.handleRestUnitsClick = this.handleRestUnitsClick.bind(this);
-    this.handleAcceptSpecialUnitsClick = this.handleAcceptSpecialUnitsClick.bind(this);
-    this.handleHistoryActionClick = this.handleHistoryActionClick.bind(this);
-  }
+  useEffect(() => {
+    if ((gameState.gameState === GameState.SETUP && gameState.acceptedUnits) ||
+      (gameState.gameState === GameState.TURN && gameState.activeTeam !== team) ||
+      (gameState.gameState === GameState.FIGHT && gameState.fightChoice != null)) {
+      if (intervalId == null) {
+        startCheck();
+      }
+    } else {
+      stopCheck();
+    }
+  }, [gameState]);
 
-  componentDidMount() {
-    this.loadActions();
-  }
+  const loadActions = () => {
+    gameBoardAdapter
+      .getActionsAsync(gameState.lastProcessedAction + 1)
+      .then(processActions)
+      .catch(processActionError);
+  };
 
-  componentWillUnmount() {
-    this.stopCheck();
-  }
+  const moveUnit = (from: Point, to: Point) => {
+    gameBoardAdapter
+      .sendActionMoveUnit(from, to, gameState.lastProcessedAction + 1)
+      .then(processActions)
+      .catch(processActionError);
+  };
 
-  loadActions() {
-    this.gameBoardAdapter
-      .getActionsAsync(this.state.gameState.lastProcessedAction + 1)
-      .then(this.processActions.bind(this))
-      .catch(this.processActionError.bind(this));
-  }
+  const handleFightUnitChosen = (unitType: UnitType) => {
+    gameBoardAdapter
+      .sendActionFightUnitChosen(unitType, gameState.lastProcessedAction + 1)
+      .then(processActions)
+      .catch(processActionError);
+  };
 
-  moveUnit(from: Point, to: Point) {
-    this.gameBoardAdapter
-      .sendActionMoveUnit(from, to, this.state.gameState.lastProcessedAction + 1)
-      .then(this.processActions.bind(this))
-      .catch(this.processActionError.bind(this));
-  }
+  const handleShuffleClick = () => {
+    gameBoardAdapter
+      .sendActionShuffleUnits(gameState.lastProcessedAction + 1)
+      .then(processActions)
+      .catch(processActionError);
+  };
 
-  handleFightUnitChosen(unitType: UnitType) {
-    this.gameBoardAdapter
-      .sendActionFightUnitChosen(unitType, this.state.gameState.lastProcessedAction + 1)
-      .then(this.processActions.bind(this))
-      .catch(this.processActionError.bind(this));
-  }
+  const handleAcceptClick = () => {
+    gameBoardAdapter
+      .sendActionAcceptUnits(gameState.lastProcessedAction + 1)
+      .then(processActions)
+      .catch(processActionError);
+  };
 
-  handleShuffleClick() {
-    this.gameBoardAdapter
-      .sendActionShuffleUnits(this.state.gameState.lastProcessedAction + 1)
-      .then(this.processActions.bind(this))
-      .catch(this.processActionError.bind(this));
-  }
-
-  handleAcceptClick() {
-    this.gameBoardAdapter
-      .sendActionAcceptUnits(this.state.gameState.lastProcessedAction + 1)
-      .then(this.processActions.bind(this))
-      .catch(this.processActionError.bind(this));
-  }
-
-  handleRestUnitsClick() {
-    this.setState({
-      setUpUnits: {
+  const handleRestUnitsClick = () => {
+    setSetUpUnits({
         trap1: null,
         trap2: null,
         flag: null,
       },
-    });
-  }
+    );
+  };
 
-  handleAcceptSpecialUnitsClick() {
-    this.gameBoardAdapter
+  const handleAcceptSpecialUnitsClick = () => {
+    gameBoardAdapter
       .sendActionSelectSpecialUnits(
-        this.state.setUpUnits.trap1!,
-        this.state.setUpUnits.trap2!,
-        this.state.setUpUnits.flag!,
-        this.state.gameState.lastProcessedAction + 1,
+        setUpUnits.trap1!,
+        setUpUnits.trap2!,
+        setUpUnits.flag!,
+        gameState.lastProcessedAction + 1,
       )
-      .then(this.processActions.bind(this))
-      .catch(this.processActionError.bind(this))
+      .then(processActions)
+      .catch(processActionError)
       .finally(() => {
-        this.setState({
-          setUpUnits: {
+        setSetUpUnits(
+          {
             trap1: null,
             trap2: null,
             flag: null,
           },
-        });
+        );
       });
-  }
+  };
 
-  handleHistoryActionClick(actionId: number) {
-    if (this.state.gameState.lastProcessedAction === actionId) {
-      this.setState({
-        shadowGameState: null,
-        displayedUntilActionId: null,
-      });
+  const handleHistoryActionClick = (actionId: number) => {
+    if (gameState.lastProcessedAction === actionId) {
+      setShadowGameState(null);
+      setDisplayedUntilActionId(null);
       return;
     }
 
-    const shadowGameState = new GameStateModel(this.team);
+    const shadowGameState = new GameStateModel(team);
     for (let i = 0; i <= actionId; i++) {
-      shadowGameState.processAction(this.state.gameState.actions[i]);
+      shadowGameState.processAction(gameState.actions[i]);
     }
 
-    this.setState({
-      shadowGameState,
-      displayedUntilActionId: actionId,
-    });
-  }
+    setShadowGameState(shadowGameState);
+    setDisplayedUntilActionId(actionId);
+  };
 
-  processActions(response: AxiosResponse<GameActionsListResponse>) {
-    const gameState = this.state.gameState.processActions(response.data.gameActions);
-    this.setState({ gameState });
+  const processActions = (response: AxiosResponse<GameActionsListResponse>) => {
+    const newGameState = gameState.processActions(response.data.gameActions);
+    setGameState(GameStateModel.copy(newGameState));
+  };
 
-    if ((gameState.gameState === GameState.SETUP && gameState.acceptedUnits) ||
-      (gameState.gameState === GameState.TURN && gameState.activeTeam !== this.team) ||
-      (gameState.gameState === GameState.FIGHT && gameState.fightChoice != null)) {
-      this.startCheck();
-    } else {
-      this.stopCheck();
-    }
-  }
-
-  processActionError(error: AxiosError) {
+  const processActionError = (error: AxiosError) => {
     if (error?.response?.data) {
       // @ts-expect-error should be casted to correct type
       alert(error.response.data.message);
     }
-  }
+  };
 
-  isMyTurn() {
-    return this.team === this.state.gameState.activeTeam;
-  }
-
-  startCheck() {
-    if (this.intervalId == null) {
-      // @ts-expect-error - setInterval expects a number
-      this.intervalId = setInterval(() => {
-        this.loadActions();
-      }, 2000);
-    }
-  }
-
-  stopCheck() {
-    clearInterval(this.intervalId!);
-    this.intervalId = null;
-  }
-
-  isAdjacentToSelectedField(otherField: Point) {
-    const selectedField = this.state.selectedField;
-
-    return selectedField != null && isAdjacent(selectedField, otherField) != null;
-  }
-
-  handleMoveUnit(from: Point, to: Point) {
-    this.moveUnit(from, to);
-  }
-
-  handlePlaceSpecialUnit(setUpUnits: GameSetupState) {
-    this.setState({ setUpUnits });
-  }
-
-  render() {
-    const gameState = this.state.gameState;
-    if (gameState.board == null) {
-      return <div />;
+  const startCheck = () => {
+    if (intervalId != null) {
+      return;
     }
 
-    return (
-      <div className="Game">
-        <GameTurnInfo playerTeam={this.team}
-                      actions={this.state.gameState.actions}
-                      setUpUnits={this.state.setUpUnits}
-                      onShuffleClick={this.handleShuffleClick}
-                      onAcceptShuffleClick={this.handleAcceptClick}
-                      onResetSpecialUnitsClick={this.handleRestUnitsClick}
-                      onAcceptSpecialUnitsClick={this.handleAcceptSpecialUnitsClick} />
-        <GameBoard team={this.team}
-                   gameState={this.state.shadowGameState ? this.state.shadowGameState : this.state.gameState}
-                   isShadowState={!!this.state.shadowGameState}
-                   setUpUnits={this.state.setUpUnits}
-                   onMoveUnit={this.handleMoveUnit}
-                   onPlaceSpecialUnit={this.handlePlaceSpecialUnit} />
-        <FightUnitSelector gameState={this.state.gameState.gameState}
-                           team={this.team}
-                           choice={this.state.gameState.fightChoice}
-                           onChooseUnit={this.handleFightUnitChosen} />
-        <GameLog displayedUntilActionId={this.state.displayedUntilActionId}
-                 gameActions={this.state.gameState.actions}
-                 onActionClick={this.handleHistoryActionClick} />
-      </div>
-    );
+    // @ts-expect-error - setInterval expects a number
+    setIntervalId(setInterval(loadActions, 2000));
+  };
+
+  const stopCheck = () => {
+    if (intervalId == null) {
+      return;
+    }
+
+    clearInterval(intervalId!);
+    setIntervalId(null);
+  };
+
+  const handleMoveUnit = (from: Point, to: Point) => {
+    moveUnit(from, to);
+  };
+
+  const handlePlaceSpecialUnit = (setUpUnits: GameSetupState) => {
+    setSetUpUnits({...setUpUnits});
+  };
+
+  if (gameState.board == null || !gameState.gameState) {
+    return <div />;
   }
-}
+
+  return (
+    <div className="Game">
+      <GameTurnInfo playerTeam={team}
+                    actions={gameState.actions}
+                    setUpUnits={setUpUnits}
+                    onShuffleClick={handleShuffleClick}
+                    onAcceptShuffleClick={handleAcceptClick}
+                    onResetSpecialUnitsClick={handleRestUnitsClick}
+                    onAcceptSpecialUnitsClick={handleAcceptSpecialUnitsClick} />
+      <GameBoard team={team}
+                 gameState={shadowGameState ? shadowGameState : gameState}
+                 isShadowState={!!shadowGameState}
+                 setUpUnits={setUpUnits}
+                 onMoveUnit={handleMoveUnit}
+                 onPlaceSpecialUnit={handlePlaceSpecialUnit} />
+      <FightUnitSelector gameState={gameState.gameState}
+                         team={team}
+                         choice={gameState.fightChoice}
+                         onChooseUnit={handleFightUnitChosen} />
+      <GameLog displayedUntilActionId={displayedUntilActionId}
+               gameActions={gameState.actions}
+               onActionClick={handleHistoryActionClick} />
+    </div>
+  );
+};
+
+export default Game;

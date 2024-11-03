@@ -2,8 +2,8 @@ import React from "react";
 import "./GameLog.sass";
 import { GameAction } from "@/model/gameaction/GameAction";
 import { GameActionType } from "@/model/gameaction/GameActionType";
-import { Team } from "@/model/Team";
 import moment from "moment";
+import Team from "@/model/Team";
 
 type Props = {
   displayedUntilActionId: number | null;

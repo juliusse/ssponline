@@ -1,8 +1,8 @@
 import { GameActionUnit } from "./GameActionUnit";
 import { GameActionType } from "./GameActionType";
-import { Team } from "@/model/Team";
 import { GameState, UnitType } from "@/constants/Constants";
 import { Point } from "@/model/Point";
+import Team from "@/model/Team";
 
 export class GameAction {
   readonly gameId: string;

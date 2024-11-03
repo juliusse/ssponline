@@ -1,9 +1,9 @@
 import { GameState, UnitType } from "@/constants/Constants";
 import { UnitModel } from "./UnitModel";
-import { Team } from "./Team";
 import { Point } from "./Point";
 import { GameAction } from "./gameaction/GameAction";
 import { Ensure } from "@/utils/Ensure";
+import Team from "@/model/Team";
 
 
 export class GameStateModel {
@@ -31,6 +31,21 @@ export class GameStateModel {
     this.acceptedSpecialUnits = false;
     this.fightLocation = null;
     this.fightChoice = null;
+  }
+
+  static copy = (gameState: GameStateModel) => {
+    const copy = new GameStateModel(gameState.playerTeam);
+    copy.gameId = gameState.gameId;
+    copy.actions = gameState.actions.slice();
+    copy.lastProcessedAction = gameState.lastProcessedAction;
+    copy.activeTeam = gameState.activeTeam;
+    copy.gameState = gameState.gameState;
+    copy.board = gameState.board?.map(row => row.map(unit => unit ? new UnitModel(unit.team, unit.type, unit.visible) : null)) || null;
+    copy.acceptedUnits = gameState.acceptedUnits;
+    copy.acceptedSpecialUnits = gameState.acceptedSpecialUnits;
+    copy.fightLocation = gameState.fightLocation ? new Point(gameState.fightLocation.x, gameState.fightLocation.y) : null;
+    copy.fightChoice = gameState.fightChoice;
+    return copy;
   }
 
 

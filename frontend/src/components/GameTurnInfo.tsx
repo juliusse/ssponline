@@ -2,8 +2,8 @@ import React from "react";
 import "./GameTurnInfo.sass";
 import { GameAction } from "@/model/gameaction/GameAction";
 import { GameActionType } from "@/model/gameaction/GameActionType";
-import { Team } from "@/model/Team";
 import { GameSetupState } from "./Game";
+import Team from "@/model/Team";
 
 type Props = {
   playerTeam: Team;

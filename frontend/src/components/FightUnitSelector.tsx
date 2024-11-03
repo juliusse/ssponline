@@ -1,53 +1,43 @@
-import React from "react";
 import { Unit } from "./Unit";
 import { UnitModel } from "@/model/UnitModel";
 import { GameState, UnitType } from "@/constants/Constants";
 import "./FightUnitSelector.sass";
-import { Team } from "@/model/Team";
+import Team from "@/model/Team";
 
-type Props = {
-  gameState: GameState | null;
+type FightUnitSelectorProps = {
+  gameState: GameState;
   onChooseUnit: (unitType: UnitType) => void;
   choice: UnitType | null;
   team: Team;
 }
 
-export class FightUnitSelector extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
+const FightUnitSelector = ({ gameState, onChooseUnit, choice, team }: FightUnitSelectorProps) => {
+  if (gameState !== GameState.FIGHT) {
+    return <div className="FightUnitSelector" />;
   }
 
-  handleClick(unitType: UnitType) {
-    this.props.onChooseUnit(unitType);
-  }
-
-  render() {
-    if (this.props.gameState !== GameState.FIGHT) {
-      return <div className="FightUnitSelector" />;
-    }
-
-    return (
-      <div className="FightUnitSelector">
-        <div className="title">Select a Unit!</div>
-        <div className="units">
-          <div>
-            <Unit isActive={this.props.choice === UnitType.ROCK}
-                  onClick={this.handleClick}
-                  model={new UnitModel(this.props.team, UnitType.ROCK, false)} />
-          </div>
-          <div>
-            <Unit isActive={this.props.choice === UnitType.PAPER}
-                  onClick={this.handleClick}
-                  model={new UnitModel(this.props.team, UnitType.PAPER, false)} />
-          </div>
-          <div>
-            <Unit isActive={this.props.choice === UnitType.SCISSORS}
-                  onClick={this.handleClick}
-                  model={new UnitModel(this.props.team, UnitType.SCISSORS, false)} />
-          </div>
+  return (
+    <div className="FightUnitSelector">
+      <div className="title">Select a Unit!</div>
+      <div className="units">
+        <div>
+          <Unit isActive={choice === UnitType.ROCK}
+                onClick={onChooseUnit}
+                model={new UnitModel(team, UnitType.ROCK, false)} />
+        </div>
+        <div>
+          <Unit isActive={choice === UnitType.PAPER}
+                onClick={onChooseUnit}
+                model={new UnitModel(team, UnitType.PAPER, false)} />
+        </div>
+        <div>
+          <Unit isActive={choice === UnitType.SCISSORS}
+                onClick={onChooseUnit}
+                model={new UnitModel(team, UnitType.SCISSORS, false)} />
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+export default FightUnitSelector;

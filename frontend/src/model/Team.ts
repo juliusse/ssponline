@@ -1,6 +1,6 @@
 import { TeamColor } from "@/constants/Constants";
 
-export class Team {
+export default class Team {
   public static RED = new Team(TeamColor.RED);
   public static BLUE = new Team(TeamColor.BLUE);
   readonly teamColor: TeamColor;
